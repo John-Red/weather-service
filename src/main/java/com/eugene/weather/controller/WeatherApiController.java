@@ -1,6 +1,6 @@
 package com.eugene.weather.controller;
 
-import com.eugene.weather.data.SensorData;
+import com.eugene.weather.repository.SensorDTO;
 import com.eugene.weather.service.WeatherService;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,10 +17,10 @@ public class WeatherApiController {
 
     @GetMapping(path = "/{sensorId}/data/avg",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public SensorData getSensorData(@PathVariable String sensorId,
-                                @RequestParam("from")
+    public SensorDTO getSensorData(@PathVariable String sensorId,
+                                   @RequestParam(value = "from", required = false)
                                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                @RequestParam("to")
+                                   @RequestParam(value = "to",required = false)
                                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return weatherService.getSensorData(sensorId,startDate, endDate);
     }
@@ -28,7 +28,7 @@ public class WeatherApiController {
     @PostMapping(path = "/add/",
                 consumes = MediaType.APPLICATION_JSON_VALUE,
                 produces = MediaType.APPLICATION_JSON_VALUE)
-    public SensorData postSensorData(@RequestBody SensorData SensorData) {
-        return weatherService.addSensorData(SensorData);
+    public SensorDTO postSensorData(@RequestBody SensorApiData SensorApiData) {
+        return weatherService.addSensorData(SensorApiData);
     }
 }
