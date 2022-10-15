@@ -11,9 +11,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class SensorApiData {
-
     private final String sensorId;
-
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private final LocalDate date;
+    private final int temperature;
 }

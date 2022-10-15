@@ -10,4 +10,5 @@ import java.time.LocalDate;
 public class SensorDTO {
     private String sensorId;
     private LocalDate date;
+    private int temperature;
 }

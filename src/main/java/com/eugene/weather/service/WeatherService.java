@@ -29,6 +29,7 @@ public class WeatherService {
         SensorDTO sensorDTO = new SensorDTO();
         sensorDTO.setSensorId(sensorApiData.getSensorId());
         sensorDTO.setDate(sensorApiData.getDate());
+        sensorDTO.setTemperature(sensorApiData.getTemperature());
         return sensorDTO;
     }
 }
