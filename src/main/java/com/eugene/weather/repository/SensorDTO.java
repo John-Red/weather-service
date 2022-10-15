@@ -1,12 +1,12 @@
 package com.eugene.weather.repository;
 
-import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
 
 @Document("Sensors")
-@AllArgsConstructor
+@Data
 public class SensorDTO {
     private String sensorId;
     private LocalDate date;
