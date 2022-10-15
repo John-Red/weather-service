@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
-public class GetWeatherDataIT {
+public class GetWeatherDataIT extends BaseSpringIT{
 
     @Test
     void test(){
