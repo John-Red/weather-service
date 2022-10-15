@@ -27,9 +27,9 @@ public class WeatherService {
 
     private SensorDTO mapToSensorDTO(SensorApiData sensorApiData) {
         SensorDTO sensorDTO = new SensorDTO();
-        sensorDTO.setSensorId(sensorApiData.getSensorId());
-        sensorDTO.setDate(sensorApiData.getDate());
-        sensorDTO.setTemperature(sensorApiData.getTemperature());
+        sensorDTO.setSensorId(sensorApiData.sensorId());
+        sensorDTO.setDate(sensorApiData.date());
+        sensorDTO.setTemperature(sensorApiData.temperature());
         return sensorDTO;
     }
 }

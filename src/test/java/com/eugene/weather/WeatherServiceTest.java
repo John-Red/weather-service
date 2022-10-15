@@ -36,9 +36,9 @@ class WeatherServiceTest {
         verify(sensorRepositoryMock).addSensorData(argumentCaptor.capture());
         SensorDTO result = argumentCaptor.getValue();
 
-        assertEquals(data.getTemperature(), result.getTemperature());
-        assertEquals(data.getDate(), result.getDate());
-        assertEquals(data.getSensorId(), result.getSensorId());
+        assertEquals(data.temperature(), result.getTemperature());
+        assertEquals(data.date(), result.getDate());
+        assertEquals(data.sensorId(), result.getSensorId());
     }
 
 }
