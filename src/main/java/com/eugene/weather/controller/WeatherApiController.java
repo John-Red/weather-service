@@ -4,6 +4,7 @@ import com.eugene.weather.repository.SensorData;
 import com.eugene.weather.service.WeatherService;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,9 +21,9 @@ public class WeatherApiController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SensorData> getSensorData(@PathVariable String sensorId,
                                                     @RequestParam(value = "from", required = false)
-                                                   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                                     @RequestParam(value = "to", required = false)
-                                                   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+                                                    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         startDate = setDefaultIfNull(startDate);
         endDate = setDefaultIfNull(endDate);
         return ResponseEntity.ok(weatherService.getSensorData(sensorId, startDate, endDate));
@@ -36,9 +37,8 @@ public class WeatherApiController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SensorData> addNewSensor(@PathVariable String sensorId) {
-        return ResponseEntity.ok(weatherService.addSensorData(sensorId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(weatherService.addSensorData(sensorId));
     }
-
 
     @PutMapping(path = "/data/{sensorId}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
