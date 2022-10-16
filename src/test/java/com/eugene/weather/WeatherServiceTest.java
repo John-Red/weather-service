@@ -1,5 +1,6 @@
 package com.eugene.weather;
 
+import com.eugene.weather.controller.SensorMetrics;
 import com.eugene.weather.repository.SensorData;
 import com.eugene.weather.repository.SensorRepository;
 import com.eugene.weather.service.WeatherService;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -28,7 +30,7 @@ class WeatherServiceTest {
 
     @Test
     void testAddsNewSensorWithEmptyData() {
-        sut.addSensorData("testId");
+        sut.addSensorData("testId", new SensorMetrics(List.of()));
 
         verify(sensorRepositoryMock).addSensorData(argumentCaptor.capture());
         SensorData result = argumentCaptor.getValue();

@@ -1,6 +1,8 @@
 package com.eugene.weather.service;
 
+import com.eugene.weather.controller.DatedSensorMetrics;
 import com.eugene.weather.controller.SensorMetrics;
+import com.eugene.weather.repository.DatedSensorData;
 import com.eugene.weather.repository.SensorData;
 import com.eugene.weather.repository.SensorRepository;
 import lombok.AllArgsConstructor;
@@ -22,9 +24,15 @@ public class WeatherService {
         return sensorRepository.getSensorData(sensorId, startDate, endDate);
     }
 
-    public SensorData addSensorData(String sensorId) {
-        SensorData sensorData = new SensorData(sensorId, List.of());
+    public SensorData addSensorData(String sensorId, SensorMetrics sensorMetrics) {
+        SensorData sensorData = new SensorData(sensorId, mapToDatedSensorData(sensorMetrics.sensorMetrics()));
         return sensorRepository.addSensorData(sensorData);
+    }
+
+    private List<DatedSensorData> mapToDatedSensorData(List<DatedSensorMetrics> sensorMetrics) {
+        return sensorMetrics.stream()
+                .map(m -> new DatedSensorData(m.date(), m.temperature()))
+                .toList();
     }
 
     public SensorData updateSensorData(String sensorId, SensorMetrics sensorMetrics) {
