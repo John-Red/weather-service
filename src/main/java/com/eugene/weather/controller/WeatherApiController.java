@@ -16,7 +16,7 @@ import java.time.LocalDate;
 public class WeatherApiController {
     private final WeatherService weatherService;
 
-    @GetMapping(path = "/sensor/{sensorId}/data/avg",
+    @GetMapping(path = "/data/{sensorId}/avg",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SensorDTO> getSensorData(@PathVariable String sensorId,
                                                    @RequestParam(value = "from", required = false)
@@ -32,7 +32,7 @@ public class WeatherApiController {
         return ResponseEntity.ok(weatherService.getSensorData(sensorId, startDate, endDate));
     }
 
-    @PostMapping(path = "/sensor/add/",
+    @PostMapping(path = "/data/add/",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SensorDTO> postSensorData(@RequestBody SensorApiData SensorApiData) {

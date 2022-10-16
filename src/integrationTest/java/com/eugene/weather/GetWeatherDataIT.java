@@ -14,7 +14,7 @@ public class GetWeatherDataIT extends BaseSpringIT {
 
     @Test
     void returnsOkWithEmptyJsonWhenSensorIsNotFound() throws Exception {
-        mockMvc.perform(get("/v1/sensor/NON_EXISTENT_SENSOR/data/avg"))
+        mockMvc.perform(get("/v1/data/NON_EXISTENT_SENSOR/avg"))
                 .andExpect(status().isOk());
     }
 
@@ -27,7 +27,7 @@ public class GetWeatherDataIT extends BaseSpringIT {
         mongoTemplate.insert(sensorDTO);
 
 
-        mockMvc.perform(get("/v1/sensor/Dublin-1/data/avg"))
+        mockMvc.perform(get("/v1/data/Dublin-1/avg"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.date").value(currentDate.toString()))
                 .andExpect(jsonPath("$.sensorId").value("Dublin-1"))
