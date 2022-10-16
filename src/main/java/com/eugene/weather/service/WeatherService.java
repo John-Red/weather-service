@@ -5,6 +5,7 @@ import com.eugene.weather.repository.SensorDTO;
 import com.eugene.weather.repository.SensorRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -15,9 +16,9 @@ public class WeatherService {
     @Autowired
     private final SensorRepository sensorRepository;
 
-    public SensorDTO getSensorData(String sensorId, LocalDate startDate, LocalDate endDate) {
+    public SensorDTO getSensorData(String sensorId, @NonNull LocalDate startDate,@NonNull LocalDate endDate) {
 
-        return sensorRepository.getSensorData(sensorId);
+        return sensorRepository.getSensorData(sensorId, startDate, endDate);
     }
 
     public SensorDTO addSensorData(SensorApiData sensorApiData) {
