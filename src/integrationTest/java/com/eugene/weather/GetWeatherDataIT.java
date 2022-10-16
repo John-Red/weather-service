@@ -13,9 +13,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class GetWeatherDataIT extends BaseSpringIT {
 
     @Test
-    void returns404WhenSensorIsNotFound() throws Exception {
+    void returnsOkWithEmptyJsonWhenSensorIsNotFound() throws Exception {
         mockMvc.perform(get("/v1/sensor/NON_EXISTENT_SENSOR/data/avg"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk());
     }
 
 
@@ -31,7 +31,6 @@ public class GetWeatherDataIT extends BaseSpringIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.date").value(currentDate.toString()))
                 .andExpect(jsonPath("$.sensorId").value("Dublin-1"))
-                .andExpect(jsonPath("$.temperature").value("15"))
-                .andReturn();
+                .andExpect(jsonPath("$.temperature").value("15"));
     }
 }
