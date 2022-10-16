@@ -13,7 +13,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({DuplicateKeyException.class})
-    public ResponseEntity<Object> handleAccessDeniedException(
+    public ResponseEntity<Object> handleDuplicateKeyException(
             Exception ex, WebRequest request) {
         return new ResponseEntity<Object>(
                 "Sensor already exists", new HttpHeaders(), HttpStatus.CONFLICT);
