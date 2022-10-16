@@ -1,59 +1,62 @@
 plugins {
-	id 'org.springframework.boot' version '2.7.4'
-	id 'io.spring.dependency-management' version '1.0.14.RELEASE'
-	id 'java'
+    id 'org.springframework.boot' version '2.7.4'
+    id 'io.spring.dependency-management' version '1.0.14.RELEASE'
+    id 'java'
 }
 
 group = 'com.eugene'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 sourceSets {
-	integrationTest {
-		java.srcDir 'src/integrationTest/java'
-		resources.srcDir 'src/integrationTest/resources'
-		compileClasspath += main.output
-		runtimeClasspath += main.output
-	}
+    integrationTest {
+        java.srcDir 'src/integrationTest/java'
+        resources.srcDir 'src/integrationTest/resources'
+        compileClasspath += main.output
+        runtimeClasspath += main.output
+    }
 }
 configurations {
-	integrationTestImplementation.extendsFrom testImplementation
-	integrationTestRuntime.extendsFrom testRuntime
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
+tasks.withType(Copy) {
+    duplicatesStrategy DuplicatesStrategy.EXCLUDE
 }
 
 task integrationTest(type: Test) {
-	testClassesDirs = sourceSets.integrationTest.output.classesDirs
-	classpath = sourceSets.integrationTest.runtimeClasspath
-	useJUnitPlatform()
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    useJUnitPlatform()
 }
 
-
+check.dependsOn integrationTest
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	//Spring
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    //Spring
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
-	//Lombok
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+    //Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
-	//Test
-	testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.junit.vintage:junit-vintage-engine'
+    //Test
+    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.junit.vintage:junit-vintage-engine'
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
