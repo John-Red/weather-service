@@ -5,6 +5,7 @@ import com.eugene.weather.service.WeatherService;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -15,20 +16,26 @@ import java.time.LocalDate;
 public class WeatherApiController {
     private final WeatherService weatherService;
 
-    @GetMapping(path = "/{sensorId}/data/avg",
+    @GetMapping(path = "/sensor/{sensorId}/data/avg",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public SensorDTO getSensorData(@PathVariable String sensorId,
-                                   @RequestParam(value = "from", required = false)
-                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                   @RequestParam(value = "to",required = false)
-                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        return weatherService.getSensorData(sensorId,startDate, endDate);
+    public ResponseEntity<SensorDTO> getSensorData(@PathVariable String sensorId,
+                                                   @RequestParam(value = "from", required = false)
+                                                   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                   @RequestParam(value = "to", required = false)
+                                                   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        if (startDate == null) {
+            startDate = LocalDate.now();
+        }
+        if (endDate == null) {
+            endDate = LocalDate.now();
+        }
+        return ResponseEntity.ok(weatherService.getSensorData(sensorId, startDate, endDate));
     }
 
-    @PostMapping(path = "/add/",
-                consumes = MediaType.APPLICATION_JSON_VALUE,
-                produces = MediaType.APPLICATION_JSON_VALUE)
-    public SensorDTO postSensorData(@RequestBody SensorApiData SensorApiData) {
-        return weatherService.addSensorData(SensorApiData);
+    @PostMapping(path = "/sensor/add/",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SensorDTO> postSensorData(@RequestBody SensorApiData SensorApiData) {
+        return ResponseEntity.ok(weatherService.addSensorData(SensorApiData));
     }
 }
