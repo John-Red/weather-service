@@ -23,13 +23,17 @@ public class WeatherService {
         return sensorRepository.getSensorData(sensorId, startDate, endDate);
     }
 
-    public SensorDTO addSensorData(SensorApiData sensorApiData) {
-        SensorDTO sensorDTO = mapToSensorDTO(sensorApiData);
+    public SensorDTO addSensorData(String sensorId) {
+        SensorDTO sensorDTO = new SensorDTO(sensorId,List.of());
         return sensorRepository.addSensorData(sensorDTO);
     }
 
-    private SensorDTO mapToSensorDTO(SensorApiData sensorApiData) {
-        return new SensorDTO(sensorApiData.sensorId(),
+    private SensorDTO mapToSensorDTO(String sensorId,SensorApiData sensorApiData) {
+        return new SensorDTO(sensorId,
                 List.of(new DatedSensorData(sensorApiData.date(), sensorApiData.temperature())));
+    }
+
+    public SensorDTO updateSensorData(String sensorId, SensorApiData sensorApiData) {
+        return null;
     }
 }

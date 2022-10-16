@@ -1,6 +1,5 @@
 package com.eugene.weather;
 
-import com.eugene.weather.controller.SensorApiData;
 import com.eugene.weather.repository.SensorDTO;
 import com.eugene.weather.repository.SensorRepository;
 import com.eugene.weather.service.WeatherService;
@@ -28,17 +27,14 @@ class WeatherServiceTest {
     }
 
     @Test
-    void testMapsValuesCorrectly() {
-        SensorApiData data = new SensorApiData("testId", DATE, 25);
-
-        sut.addSensorData(data);
+    void testAddsNewSensorWithEmptyData() {
+        sut.addSensorData("testId");
 
         verify(sensorRepositoryMock).addSensorData(argumentCaptor.capture());
         SensorDTO result = argumentCaptor.getValue();
 
-        assertEquals(data.temperature(), result.getTemperature());
-        assertEquals(data.date(), result.getDate());
-        assertEquals(data.sensorId(), result.getSensorId());
+        assertEquals("testId", result.sensorId());
+        assertEquals(0, result.datedSensorData().size());
     }
 
 }

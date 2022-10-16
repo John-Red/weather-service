@@ -23,19 +23,28 @@ public class WeatherApiController {
                                                    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                                    @RequestParam(value = "to", required = false)
                                                    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        if (startDate == null) {
-            startDate = LocalDate.now();
-        }
-        if (endDate == null) {
-            endDate = LocalDate.now();
-        }
+        startDate = setDefaultIfNull(startDate);
+        endDate = setDefaultIfNull(endDate);
         return ResponseEntity.ok(weatherService.getSensorData(sensorId, startDate, endDate));
     }
 
-    @PostMapping(path = "/data/add/",
+    private LocalDate setDefaultIfNull(LocalDate date) {
+        return date == null ? LocalDate.now() : date;
+    }
+
+    @PostMapping(path = "/data/{sensorId}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SensorDTO> postSensorData(@RequestBody SensorApiData SensorApiData) {
-        return ResponseEntity.ok(weatherService.addSensorData(SensorApiData));
+    public ResponseEntity<SensorDTO> addNewSensorData(@PathVariable String sensorId) {
+        return ResponseEntity.ok(weatherService.addSensorData(sensorId));
+    }
+
+
+    @PutMapping(path = "/data/{sensorId}",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SensorDTO> updateSensorData(@PathVariable String sensorId,
+                                                      @RequestBody SensorApiData SensorApiData) {
+        return ResponseEntity.ok(weatherService.updateSensorData(sensorId, SensorApiData));
     }
 }
