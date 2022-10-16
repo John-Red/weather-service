@@ -23,6 +23,6 @@ public class MongoSensorRepository implements SensorRepository {
 
     @Override
     public SensorDTO addSensorData(SensorDTO sensorData) {
-        return mongoTemplate.save(sensorData);
+        return mongoTemplate.insert(sensorData);
     }
 }
