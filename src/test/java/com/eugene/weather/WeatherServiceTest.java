@@ -1,6 +1,6 @@
 package com.eugene.weather;
 
-import com.eugene.weather.repository.SensorDTO;
+import com.eugene.weather.repository.SensorData;
 import com.eugene.weather.repository.SensorRepository;
 import com.eugene.weather.service.WeatherService;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +18,7 @@ class WeatherServiceTest {
     private static final LocalDate DATE = LocalDate.of(2007, 1, 1);
 
     SensorRepository sensorRepositoryMock = mock(SensorRepository.class);
-    ArgumentCaptor<SensorDTO> argumentCaptor = ArgumentCaptor.forClass(SensorDTO.class);
+    ArgumentCaptor<SensorData> argumentCaptor = ArgumentCaptor.forClass(SensorData.class);
     WeatherService sut;
 
     @BeforeEach
@@ -31,7 +31,7 @@ class WeatherServiceTest {
         sut.addSensorData("testId");
 
         verify(sensorRepositoryMock).addSensorData(argumentCaptor.capture());
-        SensorDTO result = argumentCaptor.getValue();
+        SensorData result = argumentCaptor.getValue();
 
         assertEquals("testId", result.sensorId());
         assertEquals(0, result.datedSensorData().size());

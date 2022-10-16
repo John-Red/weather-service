@@ -16,13 +16,13 @@ public class MongoSensorRepository implements SensorRepository {
     MongoTemplate mongoTemplate;
 
     @Override
-    public SensorDTO getSensorData(String sensorId, LocalDate startDate, LocalDate endDate) {
+    public SensorData getSensorData(String sensorId, LocalDate startDate, LocalDate endDate) {
         Query query = Query.query(Criteria.where("sensorId").is(sensorId));
-        return mongoTemplate.findOne(query, SensorDTO.class);
+        return mongoTemplate.findOne(query, SensorData.class);
     }
 
     @Override
-    public SensorDTO addSensorData(SensorDTO sensorData) {
+    public SensorData addSensorData(SensorData sensorData) {
         return mongoTemplate.insert(sensorData);
     }
 }

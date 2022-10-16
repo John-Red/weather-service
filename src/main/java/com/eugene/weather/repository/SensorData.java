@@ -6,5 +6,5 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.List;
 
 @Document("Sensors")
-public record SensorDTO(@Id String sensorId, List<DatedSensorData> datedSensorData) {
+public record SensorData(@Id String sensorId, List<DatedSensorData> datedSensorData) {
 }

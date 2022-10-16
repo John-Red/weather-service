@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public interface SensorRepository {
 
-    SensorDTO getSensorData(String sensorId, LocalDate startDate, LocalDate endDate);
+    SensorData getSensorData(String sensorId, LocalDate startDate, LocalDate endDate);
 
-    SensorDTO addSensorData(SensorDTO sensorDto);
+    SensorData addSensorData(SensorData sensorData);
 }

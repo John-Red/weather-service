@@ -1,6 +1,6 @@
 package com.eugene.weather.controller;
 
-import com.eugene.weather.repository.SensorDTO;
+import com.eugene.weather.repository.SensorData;
 import com.eugene.weather.service.WeatherService;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -18,10 +18,10 @@ public class WeatherApiController {
 
     @GetMapping(path = "/data/{sensorId}/avg",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SensorDTO> getSensorData(@PathVariable String sensorId,
-                                                   @RequestParam(value = "from", required = false)
+    public ResponseEntity<SensorData> getSensorData(@PathVariable String sensorId,
+                                                    @RequestParam(value = "from", required = false)
                                                    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                                   @RequestParam(value = "to", required = false)
+                                                    @RequestParam(value = "to", required = false)
                                                    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         startDate = setDefaultIfNull(startDate);
         endDate = setDefaultIfNull(endDate);
@@ -35,7 +35,7 @@ public class WeatherApiController {
     @PostMapping(path = "/data/{sensorId}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SensorDTO> addNewSensorData(@PathVariable String sensorId) {
+    public ResponseEntity<SensorData> addNewSensor(@PathVariable String sensorId) {
         return ResponseEntity.ok(weatherService.addSensorData(sensorId));
     }
 
@@ -43,8 +43,8 @@ public class WeatherApiController {
     @PutMapping(path = "/data/{sensorId}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SensorDTO> updateSensorData(@PathVariable String sensorId,
-                                                      @RequestBody SensorApiData SensorApiData) {
-        return ResponseEntity.ok(weatherService.updateSensorData(sensorId, SensorApiData));
+    public ResponseEntity<SensorData> updateSensorData(@PathVariable String sensorId,
+                                                       @RequestBody SensorMetrics SensorMetrics) {
+        return ResponseEntity.ok(weatherService.updateSensorData(sensorId, SensorMetrics));
     }
 }
