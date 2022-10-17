@@ -4,6 +4,7 @@ import com.eugene.weather.controller.data.DatedSensorMetrics;
 import com.eugene.weather.controller.data.FramedSensorMetrics;
 import com.eugene.weather.controller.data.SensorMetrics;
 import com.eugene.weather.controller.data.WeatherMetrics;
+import com.eugene.weather.controller.exceptions.WeatherAggregationServiceException;
 import com.eugene.weather.repository.SensorRepository;
 import com.eugene.weather.repository.data.SensorData;
 import com.eugene.weather.repository.data.SensorDayData;
@@ -50,6 +51,9 @@ public class WeatherAggregationService {
 
     public SensorData updateSensorData(String sensorId, @NonNull SensorMetrics sensorMetrics) {
         SensorData oldSensorData = sensorRepository.getSensorData(sensorId);
+        if (oldSensorData == null) {
+            throw new WeatherAggregationServiceException(String.format("There is no record with id: %s", sensorId));
+        }
         if (sensorMetrics.sensorMetrics().isEmpty()) {
             return oldSensorData;
         }

@@ -3,6 +3,7 @@ package com.eugene.weather;
 import com.eugene.weather.controller.data.DatedSensorMetrics;
 import com.eugene.weather.controller.data.FramedSensorMetrics;
 import com.eugene.weather.controller.data.SensorMetrics;
+import com.eugene.weather.controller.exceptions.WeatherAggregationServiceException;
 import com.eugene.weather.repository.SensorRepository;
 import com.eugene.weather.repository.data.SensorData;
 import com.eugene.weather.repository.data.SensorDayData;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -109,6 +111,20 @@ class WeatherAggregationServiceExceptionTest {
 
         SensorDayData resultData = result.datedSensorParams().get(DATE.toString());
         assertEquals(oldData, resultData);
+        verify(repositoryMock, never()).updateSensorData(any());
+    }
+
+    @Test
+    void testThrowsExceptionWhenIdDoesNotExist() {
+        mockRepositoryGetSensorData(null, null);
+
+        List<DatedSensorMetrics> newMetrics =
+                List.of(new DatedSensorMetrics(DATE, 10));
+
+
+        assertThrows(WeatherAggregationServiceException.class,
+                () -> sut.updateSensorData("no such id", new SensorMetrics(newMetrics)));
+
         verify(repositoryMock, never()).updateSensorData(any());
     }
 
