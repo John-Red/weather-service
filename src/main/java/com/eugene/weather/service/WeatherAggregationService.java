@@ -2,6 +2,7 @@ package com.eugene.weather.service;
 
 import com.eugene.weather.controller.DatedSensorMetrics;
 import com.eugene.weather.controller.SensorMetrics;
+import com.eugene.weather.controller.exceptions.WeatherAggregationServiceException;
 import com.eugene.weather.repository.AverageSensorData;
 import com.eugene.weather.repository.SensorData;
 import com.eugene.weather.repository.SensorDayData;
@@ -12,6 +13,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,18 +30,25 @@ public class WeatherAggregationService {
     }
 
     public SensorData addSensorData(String sensorId, SensorMetrics sensorMetrics) {
-        SensorData sensorData = new SensorData(sensorId, collectAverageToMap(sensorMetrics.sensorMetrics()));
+        SensorData sensorData = new SensorData(sensorId, aggregateMetricsToAverageParams(sensorMetrics.sensorMetrics()));
         return sensorRepository.addSensorData(sensorData);
     }
 
     public SensorData updateSensorData(String sensorId, SensorMetrics sensorMetrics) {
+        if (sensorMetrics == null) {
+            throw new WeatherAggregationServiceException("Update data is empty");
+        }
         SensorData oldSensorData = sensorRepository.getSensorData(sensorId);
-        Map<String, SensorDayData> newSensorData = collectAverageToMap(sensorMetrics.sensorMetrics());
-        Map<String, SensorDayData> datedSensorParams = mergeSensorDataMaps(oldSensorData.datedSensorParams(), newSensorData);
+        if (sensorMetrics.sensorMetrics().isEmpty()) {
+            return oldSensorData;
+        }
+        var oldDataParams = oldSensorData.datedSensorParams();
+        var newDataParams = aggregateMetricsToAverageParams(sensorMetrics.sensorMetrics());
+        var datedSensorParams = mergeDayDataParameters(oldDataParams, newDataParams);
         return sensorRepository.updateSensorData(new SensorData(sensorId, datedSensorParams));
     }
 
-    private Map<String, SensorDayData> collectAverageToMap(List<DatedSensorMetrics> sensorMetrics) {
+    private Map<String, SensorDayData> aggregateMetricsToAverageParams(List<DatedSensorMetrics> sensorMetrics) {
         return sensorMetrics
                 .stream()
                 .collect(Collectors.toMap(entry -> entry.date().toString(),
@@ -58,13 +67,14 @@ public class WeatherAggregationService {
                 averageSensorData.getTempCount());
     }
 
-    private Map<String, SensorDayData> mergeSensorDataMaps(Map<String, SensorDayData> first, Map<String, SensorDayData> second) {
-        if(first == null){
+    private Map<String, SensorDayData> mergeDayDataParameters(Map<String, SensorDayData> first, Map<String, SensorDayData> second) {
+        if (first == null) {
             return second;
         }
-        if (second == null){
+        if (second == null) {
             return first;
         }
+        HashMap<String, SensorDayData> mergeResult = new HashMap<>(first);
         for (Map.Entry<String, SensorDayData> entry : second.entrySet()) {
             if (first.containsKey(entry.getKey())) {
                 SensorDayData firstVal = first.get(entry.getKey());
@@ -72,11 +82,11 @@ public class WeatherAggregationService {
                 int avg = firstVal.tempAvg() + secondVal.tempAvg() / 2;
                 int sum = firstVal.tempSum() + secondVal.tempSum();
                 int count = firstVal.tempCount() + secondVal.tempCount();
-                first.put(entry.getKey() ,new SensorDayData(avg, sum, count));
+                mergeResult.put(entry.getKey(), new SensorDayData(avg, sum, count));
             } else {
-                first.put(entry.getKey(), entry.getValue());
+                mergeResult.put(entry.getKey(), entry.getValue());
             }
         }
-        return first;
+        return mergeResult;
     }
 }

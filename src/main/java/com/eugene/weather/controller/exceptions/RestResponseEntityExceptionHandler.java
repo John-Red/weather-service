@@ -1,4 +1,4 @@
-package com.eugene.weather.controller;
+package com.eugene.weather.controller.exceptions;
 
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
