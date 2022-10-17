@@ -2,7 +2,6 @@ package com.eugene.weather;
 
 import com.eugene.weather.controller.DatedSensorMetrics;
 import com.eugene.weather.controller.SensorMetrics;
-import com.eugene.weather.controller.exceptions.WeatherAggregationServiceException;
 import com.eugene.weather.repository.SensorData;
 import com.eugene.weather.repository.SensorDayData;
 import com.eugene.weather.repository.SensorRepository;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -114,11 +112,22 @@ class WeatherAggregationServiceExceptionTest {
     }
 
     @Test
-    void testDoesNotUpdateWhenNewDataIsEmpty() {
-        assertThrows(WeatherAggregationServiceException.class,
-                () -> sut.updateSensorData("testId", null));
+    void testAggregatesNewParametersWithOldOnes() {
+        String sensorId = "testId";
+        SensorDayData oldTemperature = new SensorDayData(10, 10, 1);
+        Map<String, SensorDayData> oldMetrics = Map.of(DATE.toString(), oldTemperature);
+        mockRepositoryGetSensorData(sensorId, oldMetrics);
 
-        verifyNoInteractions(repositoryMock);
+        DatedSensorMetrics newTemperature = new DatedSensorMetrics(DATE, 20);
+        List<DatedSensorMetrics> newMetrics = List.of(newTemperature);
+
+        sut.updateSensorData(sensorId, new SensorMetrics(newMetrics));
+
+        SensorData result = captureUpdateRepositoryCall();
+        SensorDayData date = result.datedSensorParams().get(DATE.toString());
+        assertEquals(15, date.tempAvg());
+        assertEquals(30, date.tempSum());
+        assertEquals(2, date.tempCount());
     }
 
     private void mockRepositoryGetSensorData(String sensorId, Map<String, SensorDayData> map) {

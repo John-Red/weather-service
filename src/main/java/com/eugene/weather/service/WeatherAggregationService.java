@@ -2,7 +2,6 @@ package com.eugene.weather.service;
 
 import com.eugene.weather.controller.DatedSensorMetrics;
 import com.eugene.weather.controller.SensorMetrics;
-import com.eugene.weather.controller.exceptions.WeatherAggregationServiceException;
 import com.eugene.weather.repository.AverageSensorData;
 import com.eugene.weather.repository.SensorData;
 import com.eugene.weather.repository.SensorDayData;
@@ -34,10 +33,7 @@ public class WeatherAggregationService {
         return sensorRepository.addSensorData(sensorData);
     }
 
-    public SensorData updateSensorData(String sensorId, SensorMetrics sensorMetrics) {
-        if (sensorMetrics == null) {
-            throw new WeatherAggregationServiceException("Update data is empty");
-        }
+    public SensorData updateSensorData(String sensorId, @NonNull SensorMetrics sensorMetrics) {
         SensorData oldSensorData = sensorRepository.getSensorData(sensorId);
         if (sensorMetrics.sensorMetrics().isEmpty()) {
             return oldSensorData;
@@ -79,7 +75,7 @@ public class WeatherAggregationService {
             if (first.containsKey(entry.getKey())) {
                 SensorDayData firstVal = first.get(entry.getKey());
                 SensorDayData secondVal = entry.getValue();
-                int avg = firstVal.tempAvg() + secondVal.tempAvg() / 2;
+                int avg = (firstVal.tempAvg() + secondVal.tempAvg()) / 2;
                 int sum = firstVal.tempSum() + secondVal.tempSum();
                 int count = firstVal.tempCount() + secondVal.tempCount();
                 mergeResult.put(entry.getKey(), new SensorDayData(avg, sum, count));
