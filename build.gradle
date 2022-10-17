@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.eugene'
-version = '0.0.1-SNAPSHOT'
+version = '1.0'
 
 configurations {
     compileOnly {
@@ -35,8 +35,6 @@ task integrationTest(type: Test) {
     classpath = sourceSets.integrationTest.runtimeClasspath
     useJUnitPlatform()
 }
-
-check.dependsOn integrationTest
 
 repositories {
     mavenCentral()
