@@ -166,7 +166,7 @@ class SensorNotFoundExceptionTest {
     }
 
     @Test
-    void testGetReturnsNanWhenThereIsNoData() {
+    void testGetReturnsNanWhenStartDateIsBiggerThatEndDate() {
         String id = "testId";
         LocalDate startDate = LocalDate.parse("2007-01-01");
         LocalDate endDate = startDate.minusDays(1);
@@ -181,7 +181,7 @@ class SensorNotFoundExceptionTest {
     }
 
     @Test
-    void testGetReturnsNanWhenStartDateIsLowerThatEndDate() {
+    void testGetReturnsNanWhenThereIsNoData() {
         String id = "testId";
         LocalDate startDate = LocalDate.parse("2007-01-01");
         LocalDate endDate = LocalDate.parse("2007-01-02");
@@ -266,6 +266,21 @@ class SensorNotFoundExceptionTest {
 
         assertEquals("all", result.sensorId());
         assertEquals(17.5, result.metrics().temperature());
+    }
+
+    @Test
+    void testGetAllReturnsNanWhenStartDateIsBiggerThatEndDate() {
+        LocalDate startDate = LocalDate.parse("2007-01-01");
+        LocalDate endDate = startDate.minusDays(1);
+        Mockito.when(repositoryMock.getAllSensorsData())
+                .thenReturn(List.of(
+                        new SensorData("firstSensor", Map.of(
+                                startDate.toString(), new SensorDayData(5, 10, 1)))));
+
+
+        FramedSensorMetrics result = sut.getAllSensorsData(startDate, endDate);
+
+        assertEquals(Double.NaN, result.metrics().temperature());
     }
 
     private void mockRepositoryGetSensorData(String sensorId, Map<String, SensorDayData> map) {
