@@ -6,13 +6,11 @@ import org.springframework.http.MediaType;
 import java.util.Map;
 
 import static com.eugene.weather.utils.JsonDataUtils.getSensorMetricsAsJsonString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 public class UpdateWeatherDataIT extends BaseSpringIT {
-
 
     @Test
     void returnsBadRequestWhenNoContent() throws Exception {
@@ -28,10 +26,8 @@ public class UpdateWeatherDataIT extends BaseSpringIT {
                         .content(getSensorMetricsAsJsonString(Map.of("date", "2022-01-01"
                                 , "temperature", "22"))))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("There is no record with id: do-not-exist"));
+                .andExpect(content().string("There is no sensor with id: do-not-exist"));
     }
-
-
 
     @Test
     void addsNewDataToSensor() throws Exception {
@@ -40,7 +36,7 @@ public class UpdateWeatherDataIT extends BaseSpringIT {
                 "date", "2022-01-01",
                 "temperature", "15"))));
 
-        mockMvc.perform(put(getUri(sensorId))
+        mockMvc.perform(put(buildUriWith(sensorId))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getSensorMetricsAsJsonString(Map.of(
                                 "date", "2022-01-02"
@@ -49,7 +45,6 @@ public class UpdateWeatherDataIT extends BaseSpringIT {
                 .andExpect(jsonPath("$.sensorId").value("London-1"))
                 .andExpect(jsonPath("$.datedSensorParams.2022-01-01.tempAvg").value("15"))
                 .andExpect(jsonPath("$.datedSensorParams.2022-01-02.tempAvg").value("20"));
-
     }
 
 
@@ -60,7 +55,7 @@ public class UpdateWeatherDataIT extends BaseSpringIT {
                 "date", "2022-01-01",
                 "temperature", "20")));
 
-        mockMvc.perform(put(getUri(sensorId))
+        mockMvc.perform(put(buildUriWith(sensorId))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getSensorMetricsAsJsonString(Map.of(
                                 "date", "2022-01-01"
@@ -70,18 +65,5 @@ public class UpdateWeatherDataIT extends BaseSpringIT {
                 .andExpect(jsonPath("$.datedSensorParams.2022-01-01.tempAvg").value("15"))
                 .andExpect(jsonPath("$.datedSensorParams.2022-01-01.tempSum").value("30"))
                 .andExpect(jsonPath("$.datedSensorParams.2022-01-01.tempCount").value("2"));
-
     }
-
-    private String getUri(String sensorId) {
-        return String.format("/v1/data/%s", sensorId);
-    }
-
-    private void sendPostRequestToCreate(String sensorId, String content) throws Exception {
-        mockMvc.perform(post(getUri(sensorId))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(content))
-                .andExpect(status().isCreated());
-    }
-
 }

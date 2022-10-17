@@ -28,14 +28,12 @@ public class WeatherAggregationService {
     private final SensorRepository sensorRepository;
 
     public FramedSensorMetrics getSensorData(String sensorId, @NonNull LocalDate startDate, @NonNull LocalDate endDate) {
-        LocalDate includeStartDate = startDate.minusDays(1);
-        LocalDate includeEndDate = endDate.plusDays(1);
         SensorData sensorData = sensorRepository.getSensorData(sensorId);
         throwNotFoundExceptionIfNull(sensorId, sensorData);
         double averageTemp = sensorData.datedSensorParams().entrySet()
                 .stream()
-                .filter(entry -> LocalDate.parse(entry.getKey()).isAfter(includeStartDate))
-                .filter(entry -> LocalDate.parse(entry.getKey()).isBefore(includeEndDate))
+                .filter(entry -> LocalDate.parse(entry.getKey()).isAfter(startDate))
+                .filter(entry -> LocalDate.parse(entry.getKey()).isBefore(endDate))
                 .map(Map.Entry::getValue)
                 .mapToInt(SensorDayData::tempAvg)
                 .average()

@@ -28,8 +28,8 @@ public class WeatherApiController {
                                                              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                                              @RequestParam(value = "to", required = false)
                                                              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        startDate = getDefaultIfNull(startDate, () -> LocalDate.MIN);
-        endDate = getDefaultIfNull(endDate, () -> LocalDate.MAX);
+        startDate = getDefaultIfNull(startDate, () -> LocalDate.EPOCH);
+        endDate = getDefaultIfNull(endDate, LocalDate::now);
         return ResponseEntity.ok(weatherAggregationService.getSensorData(sensorId, startDate, endDate));
     }
 

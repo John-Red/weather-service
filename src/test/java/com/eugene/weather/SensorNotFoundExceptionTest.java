@@ -150,11 +150,13 @@ class SensorNotFoundExceptionTest {
     @Test
     void testGetsAverageBetweenDates() {
         String id = "testId";
-        LocalDate startDate = LocalDate.parse("2007-01-01");
-        LocalDate endDate = LocalDate.parse("2007-01-02");
+        String firstDate = "2007-01-01";
+        String secondDate = "2007-01-02";
+        LocalDate startDate = LocalDate.parse(firstDate).minusDays(1);
+        LocalDate endDate = LocalDate.parse(secondDate).plusDays(1);
         mockRepositoryGetSensorData(id,
-                Map.of(startDate.toString(), new SensorDayData(10, 1, 1),
-                        endDate.toString(), new SensorDayData(20, 2, 1)));
+                Map.of(firstDate, new SensorDayData(10, 1, 1),
+                        secondDate, new SensorDayData(20, 2, 1)));
 
 
         FramedSensorMetrics result = sut.getSensorData(id, startDate, endDate);
@@ -194,13 +196,15 @@ class SensorNotFoundExceptionTest {
     @Test
     void testGetDoesNotIncludeDatesOutLimit() {
         String id = "testId";
-        LocalDate startDate = LocalDate.parse("2007-01-01");
-        LocalDate endDate = LocalDate.parse("2007-01-02");
-        LocalDate outLimitDate = LocalDate.parse("2007-01-03");
+        String firstDate = "2007-01-01";
+        String secondDate = "2007-01-02";
+        String thirdDate = "2007-01-03";
+        LocalDate startDate = LocalDate.parse(firstDate).minusDays(1);
+        LocalDate endDate = LocalDate.parse(secondDate).plusDays(1);
         mockRepositoryGetSensorData(id,
-                Map.of(startDate.toString(), new SensorDayData(10, 10, 1),
-                        endDate.toString(), new SensorDayData(20, 20, 1),
-                        outLimitDate.toString(), new SensorDayData(30, 30, 1)));
+                Map.of(firstDate, new SensorDayData(10, 10, 1),
+                        secondDate, new SensorDayData(20, 20, 1),
+                        thirdDate, new SensorDayData(30, 30, 1)));
 
 
         FramedSensorMetrics result = sut.getSensorData(id, startDate, endDate);
