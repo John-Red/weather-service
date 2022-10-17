@@ -12,15 +12,14 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 @ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureMockMvc
 public class BaseSpringIT {
-    protected static final LocalDate YESTERDAY = LocalDate.now().minus(1, ChronoUnit.DAYS);
+    protected static final LocalDate YESTERDAY = LocalDate.now().minusDays(1);
     protected static final LocalDate TODAY = LocalDate.now();
-    protected static final LocalDate TOMORROW = LocalDate.now().plus(1, ChronoUnit.DAYS);
+    protected static final LocalDate TOMORROW = LocalDate.now().plusDays(1);
     private static final Query FIND_ALL = Query.query(Criteria.where("sensorId").exists(true));
     @Autowired
     protected MockMvc mockMvc;
@@ -33,7 +32,6 @@ public class BaseSpringIT {
 
     @AfterEach
     void tearDown() {
-//        mongoTemplate.remove(FIND_ALL, "Sensors");
-        mongoTemplate.getDb().drop();
+        mongoTemplate.dropCollection("Sensors");
     }
 }

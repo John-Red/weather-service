@@ -10,7 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-public class AddWeatherDataIT extends BaseSpringIT {
+public class UpdateWeatherDataIT extends BaseSpringIT {
 
 
     @Test
