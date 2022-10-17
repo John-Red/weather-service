@@ -31,6 +31,7 @@ public class WeatherAggregationService {
         LocalDate includeStartDate = startDate.minusDays(1);
         LocalDate includeEndDate = endDate.plusDays(1);
         SensorData sensorData = sensorRepository.getSensorData(sensorId);
+        throwNotFoundExceptionIfNull(sensorId, sensorData);
         double averageTemp = sensorData.datedSensorParams().entrySet()
                 .stream()
                 .filter(entry -> LocalDate.parse(entry.getKey()).isAfter(includeStartDate))
@@ -44,6 +45,12 @@ public class WeatherAggregationService {
 
     }
 
+    private void throwNotFoundExceptionIfNull(String sensorId, SensorData sensorData) {
+        if (sensorData == null) {
+            throw new SensorNotFoundException(String.format("There is no sensor with id: %s", sensorId));
+        }
+    }
+
     public SensorData addSensorData(String sensorId, SensorMetrics sensorMetrics) {
         SensorData sensorData = new SensorData(sensorId, aggregateMetricsToAverageParams(sensorMetrics.sensorMetrics()));
         return sensorRepository.addSensorData(sensorData);
@@ -51,9 +58,7 @@ public class WeatherAggregationService {
 
     public SensorData updateSensorData(String sensorId, @NonNull SensorMetrics sensorMetrics) {
         SensorData oldSensorData = sensorRepository.getSensorData(sensorId);
-        if (oldSensorData == null) {
-            throw new SensorNotFoundException(String.format("There is no record with id: %s", sensorId));
-        }
+        throwNotFoundExceptionIfNull(sensorId, oldSensorData);
         if (sensorMetrics.sensorMetrics().isEmpty()) {
             return oldSensorData;
         }
