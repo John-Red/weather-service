@@ -60,7 +60,8 @@ public class WeatherAggregationService {
         var oldDataParams = oldSensorData.datedSensorParams();
         var newDataParams = aggregateMetricsToAverageParams(sensorMetrics.sensorMetrics());
         var datedSensorParams = mergeDayDataParameters(oldDataParams, newDataParams);
-        return sensorRepository.updateSensorData(new SensorData(sensorId, datedSensorParams));
+        sensorRepository.updateSensorData(new SensorData(sensorId, datedSensorParams));
+        return sensorRepository.getSensorData(sensorId);
     }
 
     private Map<String, SensorDayData> aggregateMetricsToAverageParams(List<DatedSensorMetrics> sensorMetrics) {
