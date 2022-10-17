@@ -1,0 +1,82 @@
+package com.eugene.weather.service;
+
+import com.eugene.weather.controller.DatedSensorMetrics;
+import com.eugene.weather.controller.SensorMetrics;
+import com.eugene.weather.repository.AverageSensorData;
+import com.eugene.weather.repository.SensorData;
+import com.eugene.weather.repository.SensorDayData;
+import com.eugene.weather.repository.SensorRepository;
+import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Service
+@AllArgsConstructor
+public class WeatherAggregationService {
+    @Autowired
+    private final SensorRepository sensorRepository;
+
+    public SensorData getSensorData(String sensorId, @NonNull LocalDate startDate, @NonNull LocalDate endDate) {
+
+        return sensorRepository.getSensorData(sensorId, startDate, endDate);
+    }
+
+    public SensorData addSensorData(String sensorId, SensorMetrics sensorMetrics) {
+        SensorData sensorData = new SensorData(sensorId, collectAverageToMap(sensorMetrics.sensorMetrics()));
+        return sensorRepository.addSensorData(sensorData);
+    }
+
+    public SensorData updateSensorData(String sensorId, SensorMetrics sensorMetrics) {
+        SensorData oldSensorData = sensorRepository.getSensorData(sensorId);
+        Map<String, SensorDayData> newSensorData = collectAverageToMap(sensorMetrics.sensorMetrics());
+        Map<String, SensorDayData> datedSensorParams = mergeSensorDataMaps(oldSensorData.datedSensorParams(), newSensorData);
+        return sensorRepository.updateSensorData(new SensorData(sensorId, datedSensorParams));
+    }
+
+    private Map<String, SensorDayData> collectAverageToMap(List<DatedSensorMetrics> sensorMetrics) {
+        return sensorMetrics
+                .stream()
+                .collect(Collectors.toMap(entry -> entry.date().toString(),
+                        entry -> new AverageSensorData(entry.temperature(), 1),
+                        AverageSensorData::getAverageSum))
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey,
+                        v -> mapToSensorDayData(v.getValue())));
+    }
+
+    private SensorDayData mapToSensorDayData(AverageSensorData averageSensorData) {
+        return new SensorDayData(
+                averageSensorData.getTempAvg(),
+                averageSensorData.getTempSum(),
+                averageSensorData.getTempCount());
+    }
+
+    private Map<String, SensorDayData> mergeSensorDataMaps(Map<String, SensorDayData> first, Map<String, SensorDayData> second) {
+        if(first == null){
+            return second;
+        }
+        if (second == null){
+            return first;
+        }
+        for (Map.Entry<String, SensorDayData> entry : second.entrySet()) {
+            if (first.containsKey(entry.getKey())) {
+                SensorDayData firstVal = first.get(entry.getKey());
+                SensorDayData secondVal = entry.getValue();
+                int avg = firstVal.tempAvg() + secondVal.tempAvg() / 2;
+                int sum = firstVal.tempSum() + secondVal.tempSum();
+                int count = firstVal.tempCount() + secondVal.tempCount();
+                first.put(entry.getKey() ,new SensorDayData(avg, sum, count));
+            } else {
+                first.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return first;
+    }
+}

@@ -3,8 +3,8 @@ package com.eugene.weather.repository;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
+import java.util.Map;
 
 @Document("Sensors")
-public record SensorData(@Id String sensorId, List<DatedSensorData> datedSensorData) {
+public record SensorData(@Id String sensorId, Map<String, SensorDayData> datedSensorParams) {
 }

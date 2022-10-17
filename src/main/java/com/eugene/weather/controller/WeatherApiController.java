@@ -1,7 +1,7 @@
 package com.eugene.weather.controller;
 
 import com.eugene.weather.repository.SensorData;
-import com.eugene.weather.service.WeatherService;
+import com.eugene.weather.service.WeatherAggregationService;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 @RequestMapping("/v1")
 @AllArgsConstructor
 public class WeatherApiController {
-    private final WeatherService weatherService;
+    private final WeatherAggregationService weatherAggregationService;
 
     @GetMapping(path = "/data/{sensorId}/avg",
             produces = MediaType.APPLICATION_JSON_VALUE)
@@ -28,7 +28,7 @@ public class WeatherApiController {
                                                     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         startDate = getDefaultIfNull(startDate, LocalDate::now);
         endDate = getDefaultIfNull(endDate, LocalDate::now);
-        return ResponseEntity.ok(weatherService.getSensorData(sensorId, startDate, endDate));
+        return ResponseEntity.ok(weatherAggregationService.getSensorData(sensorId, startDate, endDate));
     }
 
     @PostMapping(path = "/data/{sensorId}",
@@ -37,7 +37,7 @@ public class WeatherApiController {
     public ResponseEntity<SensorData> addNewSensor(@PathVariable String sensorId,
                                                    @RequestBody(required = false) SensorMetrics sensorMetrics) {
         sensorMetrics = getDefaultIfNull(sensorMetrics, () -> new SensorMetrics(List.of()));
-        return ResponseEntity.status(HttpStatus.CREATED).body(weatherService.addSensorData(sensorId, sensorMetrics));
+        return ResponseEntity.status(HttpStatus.CREATED).body(weatherAggregationService.addSensorData(sensorId, sensorMetrics));
     }
 
     private <T> T getDefaultIfNull(T obj, Supplier<T> supplier) {
@@ -49,6 +49,6 @@ public class WeatherApiController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SensorData> updateSensorData(@PathVariable String sensorId,
                                                        @RequestBody SensorMetrics sensorMetrics) {
-        return ResponseEntity.ok(weatherService.updateSensorData(sensorId, sensorMetrics));
+        return ResponseEntity.ok(weatherAggregationService.updateSensorData(sensorId, sensorMetrics));
     }
 }
