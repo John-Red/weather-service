@@ -1,5 +1,6 @@
 package com.eugene.weather.controller.exceptions;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+@Slf4j
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -29,7 +31,8 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ExceptionHandler({RuntimeException.class})
     public ResponseEntity<Object> handleRuntimeException(
             Exception ex, WebRequest request) {
+        log.error(ex.getMessage());
         return new ResponseEntity<>(
-                ex.getMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+                "", new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

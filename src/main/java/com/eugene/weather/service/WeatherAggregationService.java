@@ -17,6 +17,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.lang.Double.NaN;
@@ -27,23 +28,39 @@ public class WeatherAggregationService {
     @Autowired
     private final SensorRepository sensorRepository;
 
+    public FramedSensorMetrics getAllSensorsData(LocalDate startDate, LocalDate endDate) {
+        List<SensorData> allSensorsData = sensorRepository.getAllSensorsData();
+        throwNotFoundExceptionIfNull("all", allSensorsData);
+        double averageTemp = allSensorsData.stream()
+                .map(SensorData::datedSensorParams)
+                .map(Map::entrySet)
+                .flatMap(Set::stream)
+                .filter(params -> LocalDate.parse(params.getKey()).isAfter(startDate))
+                .filter(params -> LocalDate.parse(params.getKey()).isBefore(endDate))
+                .map(Map.Entry::getValue)
+                .mapToInt(SensorDayData::tempAvg)
+                .average()
+                .orElse(NaN);
+
+        return new FramedSensorMetrics("all", startDate, endDate, new WeatherMetrics(averageTemp));
+    }
+
     public FramedSensorMetrics getSensorData(String sensorId, @NonNull LocalDate startDate, @NonNull LocalDate endDate) {
         SensorData sensorData = sensorRepository.getSensorData(sensorId);
         throwNotFoundExceptionIfNull(sensorId, sensorData);
         double averageTemp = sensorData.datedSensorParams().entrySet()
                 .stream()
-                .filter(entry -> LocalDate.parse(entry.getKey()).isAfter(startDate))
-                .filter(entry -> LocalDate.parse(entry.getKey()).isBefore(endDate))
+                .filter(params -> LocalDate.parse(params.getKey()).isAfter(startDate))
+                .filter(params -> LocalDate.parse(params.getKey()).isBefore(endDate))
                 .map(Map.Entry::getValue)
                 .mapToInt(SensorDayData::tempAvg)
                 .average()
                 .orElse(NaN);
 
         return new FramedSensorMetrics(sensorId, startDate, endDate, new WeatherMetrics(averageTemp));
-
     }
 
-    private void throwNotFoundExceptionIfNull(String sensorId, SensorData sensorData) {
+    private void throwNotFoundExceptionIfNull(String sensorId, Object sensorData) {
         if (sensorData == null) {
             throw new SensorNotFoundException(String.format("There is no sensor with id: %s", sensorId));
         }
@@ -63,8 +80,7 @@ public class WeatherAggregationService {
         var oldDataParams = oldSensorData.datedSensorParams();
         var newDataParams = aggregateMetricsToAverageParams(sensorMetrics.sensorMetrics());
         var datedSensorParams = mergeDayDataParameters(oldDataParams, newDataParams);
-        sensorRepository.updateSensorData(new SensorData(sensorId, datedSensorParams));
-        return sensorRepository.getSensorData(sensorId);
+        return sensorRepository.updateSensorData(new SensorData(sensorId, datedSensorParams));
     }
 
     private Map<String, SensorDayData> aggregateMetricsToAverageParams(List<DatedSensorMetrics> sensorMetrics) {

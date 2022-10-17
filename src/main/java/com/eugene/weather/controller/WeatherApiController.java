@@ -21,6 +21,18 @@ import java.util.function.Supplier;
 public class WeatherApiController {
     private final WeatherAggregationService weatherAggregationService;
 
+    @GetMapping(path = "/data/all",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<FramedSensorMetrics> getAllSensorsData(
+                                                             @RequestParam(value = "from", required = false)
+                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                             @RequestParam(value = "to", required = false)
+                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        startDate = getDefaultIfNull(startDate, () -> LocalDate.EPOCH);
+        endDate = getDefaultIfNull(endDate, LocalDate::now);
+        return ResponseEntity.ok(weatherAggregationService.getAllSensorsData(startDate, endDate));
+    }
+
     @GetMapping(path = "/data/{sensorId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FramedSensorMetrics> getSensorData(@PathVariable String sensorId,

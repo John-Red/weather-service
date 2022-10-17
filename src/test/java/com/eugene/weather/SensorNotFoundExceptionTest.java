@@ -214,6 +214,60 @@ class SensorNotFoundExceptionTest {
         assertEquals(endDate, result.endDate());
     }
 
+    @Test
+    void testGetAllDataDoesNotIncludeDatesOutLimit() {
+        String firstDate = "2007-01-01";
+        String secondDate = "2007-01-02";
+        String thirdDate = "2007-01-03";
+
+        Mockito.when(repositoryMock.getAllSensorsData())
+                .thenReturn(List.of(
+                        new SensorData("firstSensor", Map.of(
+                                firstDate, new SensorDayData(5, 10, 1),
+                                secondDate, new SensorDayData(15, 20, 1),
+                                thirdDate, new SensorDayData(30, 30, 1)
+                        )),
+                        new SensorData("secondSensor", Map.of(
+                                firstDate, new SensorDayData(20, 10, 1),
+                                secondDate, new SensorDayData(30, 20, 1),
+                                thirdDate, new SensorDayData(40, 40, 1)
+                        ))));
+
+        LocalDate startDate = LocalDate.parse(secondDate).minusDays(1);
+        LocalDate endDate = LocalDate.parse(thirdDate).plusDays(1);
+
+        FramedSensorMetrics result = sut.getAllSensorsData(startDate, endDate);
+
+        assertEquals(28.75, result.metrics().temperature());
+        assertEquals(startDate, result.startDate());
+        assertEquals(endDate, result.endDate());
+    }
+
+    @Test
+    void testAllDataGetsAverageBetweenDates() {
+        String firstDate = "2007-01-01";
+        String secondDate = "2007-01-02";
+
+        Mockito.when(repositoryMock.getAllSensorsData())
+                .thenReturn(List.of(
+                        new SensorData("firstSensor", Map.of(
+                                firstDate, new SensorDayData(5, 10, 1),
+                                secondDate, new SensorDayData(15, 20, 1)
+                        )),
+                        new SensorData("secondSensor", Map.of(
+                                firstDate, new SensorDayData(20, 10, 1),
+                                secondDate, new SensorDayData(30, 20, 1)
+                        ))));
+
+        LocalDate startDate = LocalDate.parse(firstDate).minusDays(1);
+        LocalDate endDate = LocalDate.parse(secondDate).plusDays(1);
+
+        FramedSensorMetrics result = sut.getAllSensorsData(startDate, endDate);
+
+        assertEquals("all", result.sensorId());
+        assertEquals(17.5, result.metrics().temperature());
+    }
+
     private void mockRepositoryGetSensorData(String sensorId, Map<String, SensorDayData> map) {
         SensorData sensorData = new SensorData(sensorId, map);
         Mockito.when(repositoryMock.getSensorData(eq(sensorId))).thenReturn(sensorData);
