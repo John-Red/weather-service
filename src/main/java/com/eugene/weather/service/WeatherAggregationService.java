@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.lang.Double.NaN;
+
 @Service
 @AllArgsConstructor
 public class WeatherAggregationService {
@@ -36,7 +38,7 @@ public class WeatherAggregationService {
                 .map(Map.Entry::getValue)
                 .mapToInt(SensorDayData::tempAvg)
                 .average()
-                .orElse(0.0);
+                .orElse(NaN);
 
         return new FramedSensorMetrics(sensorId, startDate, endDate, new WeatherMetrics(averageTemp));
 

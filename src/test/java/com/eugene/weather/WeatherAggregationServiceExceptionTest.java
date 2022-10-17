@@ -148,6 +148,34 @@ class WeatherAggregationServiceExceptionTest {
     }
 
     @Test
+    void testReturnsNanWhenThereIsNoData() {
+        String id = "testId";
+        LocalDate startDate = LocalDate.parse("2007-01-01");
+        LocalDate endDate = startDate.minusDays(1);
+        mockRepositoryGetSensorData(id,
+                Map.of(startDate.toString(), new SensorDayData(10, 1, 1),
+                        endDate.toString(), new SensorDayData(20, 2, 1)));
+
+
+        FramedSensorMetrics result = sut.getSensorData(id, startDate, endDate);
+
+        assertEquals(Double.NaN, result.metrics().temperature());
+    }
+
+    @Test
+    void testReturnsNanWhenStartDateIsLowerThatEndDate() {
+        String id = "testId";
+        LocalDate startDate = LocalDate.parse("2007-01-01");
+        LocalDate endDate = LocalDate.parse("2007-01-02");
+        mockRepositoryGetSensorData(id, Map.of());
+
+
+        FramedSensorMetrics result = sut.getSensorData(id, startDate, endDate);
+
+        assertEquals(Double.NaN, result.metrics().temperature());
+    }
+
+    @Test
     void testDoesNotIncludeDatesOutLimit() {
         String id = "testId";
         LocalDate startDate = LocalDate.parse("2007-01-01");
