@@ -1,4 +1,4 @@
-package com.eugene.weather;
+package com.eugene.weather.utils;
 
 import java.util.Map;
 import java.util.StringJoiner;

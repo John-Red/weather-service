@@ -5,13 +5,12 @@ import org.springframework.http.MediaType;
 
 import java.util.Map;
 
-import static com.eugene.weather.JsonMapper.mapToJsonString;
+import static com.eugene.weather.utils.JsonDataUtils.getSensorMetricsAsJsonString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 public class AddWeatherDataIT extends BaseSpringIT {
-
 
     @Test
     void addsSensorDataById() throws Exception {
@@ -34,19 +33,26 @@ public class AddWeatherDataIT extends BaseSpringIT {
     }
 
     @Test
+    void returnsErrorWhenBrokenContent() throws Exception {
+        String brokenMetricsWithEmptyParams = getSensorMetricsAsJsonString(Map.of());
+
+        mockMvc.perform(post("/v1/data/London-1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(brokenMetricsWithEmptyParams))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void addsSensorDataWithBody() throws Exception {
         mockMvc.perform(post("/v1/data/London-1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(getSensorMetricsContent(Map.of(
+                        .content(getSensorMetricsAsJsonString(Map.of(
                                 "date", "2022-10-14",
                                 "temperature", "20"))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.sensorId").value("London-1"))
-                .andExpect(jsonPath("$.datedSensorParams[0].date").value("2022-10-14"))
-                .andExpect(jsonPath("$.datedSensorParams[0].temperature").value("20"));
-    }
-
-    private String getSensorMetricsContent(Map<String, String> params) {
-        return "{\"sensorMetrics\": [" + mapToJsonString(params) + "]}";
+                .andExpect(jsonPath("$.datedSensorParams.2022-10-14.tempAvg").value("20"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-10-14.tempSum").value("20"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-10-14.tempCount").value("1"));
     }
 }

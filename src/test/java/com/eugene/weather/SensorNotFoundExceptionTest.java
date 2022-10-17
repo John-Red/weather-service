@@ -3,7 +3,7 @@ package com.eugene.weather;
 import com.eugene.weather.controller.data.DatedSensorMetrics;
 import com.eugene.weather.controller.data.FramedSensorMetrics;
 import com.eugene.weather.controller.data.SensorMetrics;
-import com.eugene.weather.controller.exceptions.WeatherAggregationServiceException;
+import com.eugene.weather.controller.exceptions.SensorNotFoundException;
 import com.eugene.weather.repository.SensorRepository;
 import com.eugene.weather.repository.data.SensorData;
 import com.eugene.weather.repository.data.SensorDayData;
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-class WeatherAggregationServiceExceptionTest {
+class SensorNotFoundExceptionTest {
 
     private static final LocalDate DATE = LocalDate.of(2007, 1, 1);
     private static final LocalDate NEXT_DATE = DATE.plusDays(1);
@@ -45,7 +45,7 @@ class WeatherAggregationServiceExceptionTest {
     }
 
     @Test
-    void testAggregatesTwoMetricsInDay() {
+    void testAddAggregatesTwoMetricsInDay() {
         int firstTemperature = 10;
         int secondTemperature = 20;
         List<DatedSensorMetrics> twoMetricsForDay =
@@ -62,7 +62,7 @@ class WeatherAggregationServiceExceptionTest {
     }
 
     @Test
-    void testDoesNotAggregateMetricsForDifferentDates() {
+    void testAddDoesNotAggregateMetricsForDifferentDates() {
         int firstTemperature = 10;
         int secondTemperature = 20;
         List<DatedSensorMetrics> twoMetricsForDifferentDays =
@@ -101,7 +101,7 @@ class WeatherAggregationServiceExceptionTest {
     }
 
     @Test
-    void testReturnsOldDataWhenNewMetricsIsEmpty() {
+    void testUpdateReturnsOldDataWhenNewMetricsIsEmpty() {
         String id = "testId";
         SensorDayData oldData = new SensorDayData(15, 30, 2);
         mockRepositoryGetSensorData(id, Map.of(DATE.toString(), oldData));
@@ -115,21 +115,21 @@ class WeatherAggregationServiceExceptionTest {
     }
 
     @Test
-    void testThrowsExceptionWhenIdDoesNotExist() {
+    void testUpdateThrowsExceptionWhenIdDoesNotExist() {
         mockRepositoryGetSensorData(null, null);
 
         List<DatedSensorMetrics> newMetrics =
                 List.of(new DatedSensorMetrics(DATE, 10));
 
 
-        assertThrows(WeatherAggregationServiceException.class,
+        assertThrows(SensorNotFoundException.class,
                 () -> sut.updateSensorData("no such id", new SensorMetrics(newMetrics)));
 
         verify(repositoryMock, never()).updateSensorData(any());
     }
 
     @Test
-    void testAggregatesNewParametersWithOldOnes() {
+    void testUpdateAggregatesNewParametersWithOldOnes() {
         String id = "testId";
         SensorDayData oldTemperature = new SensorDayData(10, 10, 1);
         Map<String, SensorDayData> oldMetrics = Map.of(DATE.toString(), oldTemperature);
@@ -164,7 +164,7 @@ class WeatherAggregationServiceExceptionTest {
     }
 
     @Test
-    void testReturnsNanWhenThereIsNoData() {
+    void testGetReturnsNanWhenThereIsNoData() {
         String id = "testId";
         LocalDate startDate = LocalDate.parse("2007-01-01");
         LocalDate endDate = startDate.minusDays(1);
@@ -179,7 +179,7 @@ class WeatherAggregationServiceExceptionTest {
     }
 
     @Test
-    void testReturnsNanWhenStartDateIsLowerThatEndDate() {
+    void testGetReturnsNanWhenStartDateIsLowerThatEndDate() {
         String id = "testId";
         LocalDate startDate = LocalDate.parse("2007-01-01");
         LocalDate endDate = LocalDate.parse("2007-01-02");
@@ -192,7 +192,7 @@ class WeatherAggregationServiceExceptionTest {
     }
 
     @Test
-    void testDoesNotIncludeDatesOutLimit() {
+    void testGetDoesNotIncludeDatesOutLimit() {
         String id = "testId";
         LocalDate startDate = LocalDate.parse("2007-01-01");
         LocalDate endDate = LocalDate.parse("2007-01-02");

@@ -15,21 +15,21 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ExceptionHandler({DuplicateKeyException.class})
     public ResponseEntity<Object> handleDuplicateKeyException(
             Exception ex, WebRequest request) {
-        return new ResponseEntity<Object>(
+        return new ResponseEntity<>(
                 "Sensor already exists", new HttpHeaders(), HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler({WeatherAggregationServiceException.class})
+    @ExceptionHandler({SensorNotFoundException.class})
     public ResponseEntity<Object> handleWeatherAggregationServiceException(
             Exception ex, WebRequest request) {
-        return new ResponseEntity<Object>(
-                ex.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(
+                ex.getMessage(), new HttpHeaders(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler({RuntimeException.class})
     public ResponseEntity<Object> handleRuntimeException(
             Exception ex, WebRequest request) {
-        return new ResponseEntity<Object>(
+        return new ResponseEntity<>(
                 ex.getMessage(), new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

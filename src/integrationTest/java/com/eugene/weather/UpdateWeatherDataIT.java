@@ -5,8 +5,9 @@ import org.springframework.http.MediaType;
 
 import java.util.Map;
 
-import static com.eugene.weather.JsonMapper.mapToJsonString;
+import static com.eugene.weather.utils.JsonDataUtils.getSensorMetricsAsJsonString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -14,39 +15,73 @@ public class UpdateWeatherDataIT extends BaseSpringIT {
 
 
     @Test
-    void addsSensorDataById() throws Exception {
-        mockMvc.perform(post("/v1/data/London-1")
+    void returnsBadRequestWhenNoContent() throws Exception {
+        mockMvc.perform(put("/v1/data/London-1")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.sensorId").value("London-1"));
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    void returnsErrorWhenRecordAlreadyExists() throws Exception {
-        mockMvc.perform(post("/v1/data/London-1")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
-
-        mockMvc.perform(post("/v1/data/London-1")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isConflict())
-                .andExpect(content().string("Sensor already exists"));
-    }
-
-    @Test
-    void addsSensorDataWithBody() throws Exception {
-        mockMvc.perform(post("/v1/data/London-1")
+    void returnsNotFoundWhenThereIsNoSensorIdInDatabase() throws Exception {
+        mockMvc.perform(put("/v1/data/do-not-exist")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(getSensorMetricsContent(Map.of(
-                                "date", "2022-10-14",
-                                "temperature", "20"))))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.sensorId").value("London-1"))
-                .andExpect(jsonPath("$.datedSensorParams[0].date").value("2022-10-14"))
-                .andExpect(jsonPath("$.datedSensorParams[0].temperature").value("20"));
+                        .content(getSensorMetricsAsJsonString(Map.of("date", "2022-01-01"
+                                , "temperature", "22"))))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("There is no record with id: do-not-exist"));
     }
 
-    private String getSensorMetricsContent(Map<String, String> params) {
-        return "{\"sensorMetrics\": [" + mapToJsonString(params) + "]}";
+
+
+    @Test
+    void addsNewDataToSensor() throws Exception {
+        String sensorId = "London-1";
+        sendPostRequestToCreate(sensorId, getSensorMetricsAsJsonString((Map.of(
+                "date", "2022-01-01",
+                "temperature", "15"))));
+
+        mockMvc.perform(put(getUri(sensorId))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(getSensorMetricsAsJsonString(Map.of(
+                                "date", "2022-01-02"
+                                , "temperature", "20"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sensorId").value("London-1"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.tempAvg").value("15"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-01-02.tempAvg").value("20"));
+
     }
+
+
+    @Test
+    void updatesSensorWithNewData() throws Exception {
+        String sensorId = "London-1";
+        sendPostRequestToCreate(sensorId, getSensorMetricsAsJsonString(Map.of(
+                "date", "2022-01-01",
+                "temperature", "20")));
+
+        mockMvc.perform(put(getUri(sensorId))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(getSensorMetricsAsJsonString(Map.of(
+                                "date", "2022-01-01"
+                                , "temperature", "10"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.sensorId").value("London-1"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.tempAvg").value("15"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.tempSum").value("30"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.tempCount").value("2"));
+
+    }
+
+    private String getUri(String sensorId) {
+        return String.format("/v1/data/%s", sensorId);
+    }
+
+    private void sendPostRequestToCreate(String sensorId, String content) throws Exception {
+        mockMvc.perform(post(getUri(sensorId))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content))
+                .andExpect(status().isCreated());
+    }
+
 }
