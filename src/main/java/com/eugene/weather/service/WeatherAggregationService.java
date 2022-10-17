@@ -53,7 +53,7 @@ public class WeatherAggregationService {
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey,
-                        v -> mapToSensorDayData(v.getValue())));
+                        avgSensData -> mapToSensorDayData(avgSensData.getValue())));
     }
 
     private SensorDayData mapToSensorDayData(AverageSensorData averageSensorData) {
@@ -73,16 +73,19 @@ public class WeatherAggregationService {
         HashMap<String, SensorDayData> mergeResult = new HashMap<>(first);
         for (Map.Entry<String, SensorDayData> entry : second.entrySet()) {
             if (first.containsKey(entry.getKey())) {
-                SensorDayData firstVal = first.get(entry.getKey());
-                SensorDayData secondVal = entry.getValue();
-                int avg = (firstVal.tempAvg() + secondVal.tempAvg()) / 2;
-                int sum = firstVal.tempSum() + secondVal.tempSum();
-                int count = firstVal.tempCount() + secondVal.tempCount();
-                mergeResult.put(entry.getKey(), new SensorDayData(avg, sum, count));
+                SensorDayData newValue = collapseSensorData(first.get(entry.getKey()), entry.getValue());
+                mergeResult.put(entry.getKey(), newValue);
             } else {
                 mergeResult.put(entry.getKey(), entry.getValue());
             }
         }
         return mergeResult;
+    }
+
+    private SensorDayData collapseSensorData(SensorDayData firstVal, SensorDayData secondVal) {
+        int avg = (firstVal.tempAvg() + secondVal.tempAvg()) / 2;
+        int sum = firstVal.tempSum() + secondVal.tempSum();
+        int count = firstVal.tempCount() + secondVal.tempCount();
+        return new SensorDayData(avg, sum, count);
     }
 }
