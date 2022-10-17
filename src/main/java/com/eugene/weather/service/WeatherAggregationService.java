@@ -1,7 +1,9 @@
 package com.eugene.weather.service;
 
 import com.eugene.weather.controller.DatedSensorMetrics;
+import com.eugene.weather.controller.FramedSensorMetrics;
 import com.eugene.weather.controller.SensorMetrics;
+import com.eugene.weather.controller.WeatherMetrics;
 import com.eugene.weather.repository.AverageSensorData;
 import com.eugene.weather.repository.SensorData;
 import com.eugene.weather.repository.SensorDayData;
@@ -23,9 +25,21 @@ public class WeatherAggregationService {
     @Autowired
     private final SensorRepository sensorRepository;
 
-    public SensorData getSensorData(String sensorId, @NonNull LocalDate startDate, @NonNull LocalDate endDate) {
+    public FramedSensorMetrics getSensorData(String sensorId, @NonNull LocalDate startDate, @NonNull LocalDate endDate) {
+        LocalDate includeStartDate = startDate.minusDays(1);
+        LocalDate includeEndDate = endDate.plusDays(1);
+        SensorData sensorData = sensorRepository.getSensorData(sensorId);
+        double averageTemp = sensorData.datedSensorParams().entrySet()
+                .stream()
+                .filter(entry -> LocalDate.parse(entry.getKey()).isAfter(includeStartDate))
+                .filter(entry -> LocalDate.parse(entry.getKey()).isBefore(includeEndDate))
+                .map(Map.Entry::getValue)
+                .mapToInt(SensorDayData::tempAvg)
+                .average()
+                .orElse(0.0);
 
-        return sensorRepository.getSensorData(sensorId, startDate, endDate);
+        return new FramedSensorMetrics(sensorId, startDate, endDate, new WeatherMetrics(averageTemp));
+
     }
 
     public SensorData addSensorData(String sensorId, SensorMetrics sensorMetrics) {

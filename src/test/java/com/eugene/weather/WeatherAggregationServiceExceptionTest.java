@@ -1,6 +1,7 @@
 package com.eugene.weather;
 
 import com.eugene.weather.controller.DatedSensorMetrics;
+import com.eugene.weather.controller.FramedSensorMetrics;
 import com.eugene.weather.controller.SensorMetrics;
 import com.eugene.weather.repository.SensorData;
 import com.eugene.weather.repository.SensorDayData;
@@ -83,12 +84,12 @@ class WeatherAggregationServiceExceptionTest {
     @Test
     void testUpdatesEmptyParametersWithNewMetrics() {
         int newTemperature = 10;
-        String sensorId = "testId";
+        String id = "testId";
         List<DatedSensorMetrics> newMetrics =
                 List.of(new DatedSensorMetrics(DATE, newTemperature));
-        mockRepositoryGetSensorData(sensorId, Map.of());
+        mockRepositoryGetSensorData(id, Map.of());
 
-        sut.updateSensorData(sensorId, new SensorMetrics(newMetrics));
+        sut.updateSensorData(id, new SensorMetrics(newMetrics));
 
         SensorData result = captureUpdateRepositoryCall();
         SensorDayData date = result.datedSensorParams().get(DATE.toString());
@@ -99,12 +100,12 @@ class WeatherAggregationServiceExceptionTest {
 
     @Test
     void testReturnsOldDataWhenNewMetricsIsEmpty() {
-        String sensorId = "testId";
+        String id = "testId";
         SensorDayData oldData = new SensorDayData(15, 30, 2);
-        mockRepositoryGetSensorData(sensorId, Map.of(DATE.toString(), oldData));
+        mockRepositoryGetSensorData(id, Map.of(DATE.toString(), oldData));
         List<DatedSensorMetrics> newEmptyMetrics = List.of();
 
-        SensorData result = sut.updateSensorData(sensorId, new SensorMetrics(newEmptyMetrics));
+        SensorData result = sut.updateSensorData(id, new SensorMetrics(newEmptyMetrics));
 
         SensorDayData resultData = result.datedSensorParams().get(DATE.toString());
         assertEquals(oldData, resultData);
@@ -113,21 +114,36 @@ class WeatherAggregationServiceExceptionTest {
 
     @Test
     void testAggregatesNewParametersWithOldOnes() {
-        String sensorId = "testId";
+        String id = "testId";
         SensorDayData oldTemperature = new SensorDayData(10, 10, 1);
         Map<String, SensorDayData> oldMetrics = Map.of(DATE.toString(), oldTemperature);
-        mockRepositoryGetSensorData(sensorId, oldMetrics);
+        mockRepositoryGetSensorData(id, oldMetrics);
 
         DatedSensorMetrics newTemperature = new DatedSensorMetrics(DATE, 20);
         List<DatedSensorMetrics> newMetrics = List.of(newTemperature);
 
-        sut.updateSensorData(sensorId, new SensorMetrics(newMetrics));
+        sut.updateSensorData(id, new SensorMetrics(newMetrics));
 
         SensorData result = captureUpdateRepositoryCall();
         SensorDayData date = result.datedSensorParams().get(DATE.toString());
         assertEquals(15, date.tempAvg());
         assertEquals(30, date.tempSum());
         assertEquals(2, date.tempCount());
+    }
+
+    @Test
+    void testGetsAverageBetweenDates() {
+        String id = "testId";
+        LocalDate startDate = LocalDate.parse("2007-01-01");
+        LocalDate endDate = LocalDate.parse("2007-01-02");
+        mockRepositoryGetSensorData(id,
+                Map.of(startDate.toString(), new SensorDayData(10, 1, 1),
+                        endDate.toString(), new SensorDayData(20, 2, 1)));
+
+
+        FramedSensorMetrics result = sut.getSensorData(id, startDate, endDate);
+
+        assertEquals(15, result.metrics().temperature());
     }
 
     private void mockRepositoryGetSensorData(String sensorId, Map<String, SensorDayData> map) {

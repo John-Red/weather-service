@@ -21,7 +21,7 @@ public class WeatherApiController {
 
     @GetMapping(path = "/data/{sensorId}/avg",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SensorData> getSensorData(@PathVariable String sensorId,
+    public ResponseEntity<FramedSensorMetrics> getSensorData(@PathVariable String sensorId,
                                                     @RequestParam(value = "from", required = false)
                                                     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                                     @RequestParam(value = "to", required = false)

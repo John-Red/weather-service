@@ -8,8 +8,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-
 @Repository
 @AllArgsConstructor
 public class MongoSensorRepository implements SensorRepository {
@@ -23,12 +21,6 @@ public class MongoSensorRepository implements SensorRepository {
     }
 
     @Override
-    public SensorData getSensorData(String sensorId, LocalDate startDate, LocalDate endDate) {
-        Query query = Query.query(Criteria.where("sensorId").is(sensorId));
-        return mongoOperations.findOne(query, SensorData.class);
-    }
-
-    @Override
     public SensorData addSensorData(SensorData sensorData) {
         return mongoOperations.insert(sensorData);
     }
@@ -37,6 +29,6 @@ public class MongoSensorRepository implements SensorRepository {
     public SensorData updateSensorData(SensorData sensorData) {
         Query query = Query.query(Criteria.where("sensorId").is(sensorData.sensorId()));
         Update update = Update.update("datedSensorParams", sensorData.datedSensorParams());
-        return mongoOperations.findAndModify(query,update, SensorData.class, "Sensors");
+        return mongoOperations.findAndModify(query, update, SensorData.class, "Sensors");
     }
 }
