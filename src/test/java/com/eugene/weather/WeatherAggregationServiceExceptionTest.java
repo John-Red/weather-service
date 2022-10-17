@@ -143,7 +143,27 @@ class WeatherAggregationServiceExceptionTest {
 
         FramedSensorMetrics result = sut.getSensorData(id, startDate, endDate);
 
+        assertEquals("testId", result.sensorId());
         assertEquals(15, result.metrics().temperature());
+    }
+
+    @Test
+    void testDoesNotIncludeDatesOutLimit() {
+        String id = "testId";
+        LocalDate startDate = LocalDate.parse("2007-01-01");
+        LocalDate endDate = LocalDate.parse("2007-01-02");
+        LocalDate outLimitDate = LocalDate.parse("2007-01-03");
+        mockRepositoryGetSensorData(id,
+                Map.of(startDate.toString(), new SensorDayData(10, 10, 1),
+                        endDate.toString(), new SensorDayData(20, 20, 1),
+                        outLimitDate.toString(), new SensorDayData(30, 30, 1)));
+
+
+        FramedSensorMetrics result = sut.getSensorData(id, startDate, endDate);
+
+        assertEquals(15, result.metrics().temperature());
+        assertEquals(startDate, result.startDate());
+        assertEquals(endDate, result.endDate());
     }
 
     private void mockRepositoryGetSensorData(String sensorId, Map<String, SensorDayData> map) {
