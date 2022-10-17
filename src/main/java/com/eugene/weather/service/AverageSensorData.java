@@ -1,4 +1,4 @@
-package com.eugene.weather.repository;
+package com.eugene.weather.service;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

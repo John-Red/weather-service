@@ -1,4 +1,4 @@
-package com.eugene.weather.controller;
+package com.eugene.weather.controller.data;
 
 import org.springframework.format.annotation.DateTimeFormat;
 

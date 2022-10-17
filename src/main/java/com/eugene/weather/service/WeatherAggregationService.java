@@ -1,13 +1,12 @@
 package com.eugene.weather.service;
 
-import com.eugene.weather.controller.DatedSensorMetrics;
-import com.eugene.weather.controller.FramedSensorMetrics;
-import com.eugene.weather.controller.SensorMetrics;
-import com.eugene.weather.controller.WeatherMetrics;
-import com.eugene.weather.repository.AverageSensorData;
-import com.eugene.weather.repository.SensorData;
-import com.eugene.weather.repository.SensorDayData;
+import com.eugene.weather.controller.data.DatedSensorMetrics;
+import com.eugene.weather.controller.data.FramedSensorMetrics;
+import com.eugene.weather.controller.data.SensorMetrics;
+import com.eugene.weather.controller.data.WeatherMetrics;
 import com.eugene.weather.repository.SensorRepository;
+import com.eugene.weather.repository.data.SensorData;
+import com.eugene.weather.repository.data.SensorDayData;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;

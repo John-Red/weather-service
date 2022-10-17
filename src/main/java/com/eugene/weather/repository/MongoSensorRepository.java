@@ -1,5 +1,6 @@
 package com.eugene.weather.repository;
 
+import com.eugene.weather.repository.data.SensorData;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;

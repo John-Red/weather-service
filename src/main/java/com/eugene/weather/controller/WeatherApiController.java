@@ -1,6 +1,8 @@
 package com.eugene.weather.controller;
 
-import com.eugene.weather.repository.SensorData;
+import com.eugene.weather.controller.data.FramedSensorMetrics;
+import com.eugene.weather.controller.data.SensorMetrics;
+import com.eugene.weather.repository.data.SensorData;
 import com.eugene.weather.service.WeatherAggregationService;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -22,10 +24,10 @@ public class WeatherApiController {
     @GetMapping(path = "/data/{sensorId}/avg",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FramedSensorMetrics> getSensorData(@PathVariable String sensorId,
-                                                    @RequestParam(value = "from", required = false)
-                                                    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                                    @RequestParam(value = "to", required = false)
-                                                    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+                                                             @RequestParam(value = "from", required = false)
+                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                                             @RequestParam(value = "to", required = false)
+                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         startDate = getDefaultIfNull(startDate, LocalDate::now);
         endDate = getDefaultIfNull(endDate, LocalDate::now);
         return ResponseEntity.ok(weatherAggregationService.getSensorData(sensorId, startDate, endDate));

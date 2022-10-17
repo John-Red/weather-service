@@ -1,11 +1,11 @@
 package com.eugene.weather;
 
-import com.eugene.weather.controller.DatedSensorMetrics;
-import com.eugene.weather.controller.FramedSensorMetrics;
-import com.eugene.weather.controller.SensorMetrics;
-import com.eugene.weather.repository.SensorData;
-import com.eugene.weather.repository.SensorDayData;
+import com.eugene.weather.controller.data.DatedSensorMetrics;
+import com.eugene.weather.controller.data.FramedSensorMetrics;
+import com.eugene.weather.controller.data.SensorMetrics;
 import com.eugene.weather.repository.SensorRepository;
+import com.eugene.weather.repository.data.SensorData;
+import com.eugene.weather.repository.data.SensorDayData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
