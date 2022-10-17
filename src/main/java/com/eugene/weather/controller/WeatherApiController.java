@@ -21,15 +21,15 @@ import java.util.function.Supplier;
 public class WeatherApiController {
     private final WeatherAggregationService weatherAggregationService;
 
-    @GetMapping(path = "/data/{sensorId}/avg",
+    @GetMapping(path = "/data/{sensorId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FramedSensorMetrics> getSensorData(@PathVariable String sensorId,
                                                              @RequestParam(value = "from", required = false)
                                                              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                                              @RequestParam(value = "to", required = false)
                                                              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        startDate = getDefaultIfNull(startDate, LocalDate::now);
-        endDate = getDefaultIfNull(endDate, LocalDate::now);
+        startDate = getDefaultIfNull(startDate, () -> LocalDate.MIN);
+        endDate = getDefaultIfNull(endDate, () -> LocalDate.MAX);
         return ResponseEntity.ok(weatherAggregationService.getSensorData(sensorId, startDate, endDate));
     }
 
