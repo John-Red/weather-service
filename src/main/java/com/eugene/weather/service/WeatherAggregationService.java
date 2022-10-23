@@ -5,8 +5,8 @@ import com.eugene.weather.controller.data.FramedSensorMetrics;
 import com.eugene.weather.controller.data.SensorMetrics;
 import com.eugene.weather.controller.data.WeatherMetrics;
 import com.eugene.weather.controller.exceptions.SensorNotFoundException;
+import com.eugene.weather.mapper.MetricsMapper;
 import com.eugene.weather.repository.SensorRepository;
-import com.eugene.weather.repository.data.AverageData;
 import com.eugene.weather.repository.data.SensorData;
 import com.eugene.weather.repository.data.SensorDayData;
 import lombok.AllArgsConstructor;
@@ -27,6 +27,8 @@ import java.util.stream.Stream;
 public class WeatherAggregationService {
     @Autowired
     private final SensorRepository sensorRepository;
+    @Autowired
+    private final MetricsMapper mapper;
 
     public FramedSensorMetrics getAllSensorsData(LocalDate startDate, LocalDate endDate) {
         List<SensorData> allSensorsData = sensorRepository.getAllSensorsData();
@@ -56,15 +58,10 @@ public class WeatherAggregationService {
                 .filter(params -> LocalDate.parse(params.getKey()).isAfter(startDate))
                 .filter(params -> LocalDate.parse(params.getKey()).isBefore(endDate))
                 .map(Map.Entry::getValue)
-                .map(this::mapToAverageMetrics)
+                .map(mapper::mapToAverageMetrics)
                 .reduce(AverageMetrics::plus)
                 .map(am -> new WeatherMetrics(am.getTemperature().getAvg(), am.getHumidity().getAvg()))
                 .orElse(new WeatherMetrics(Double.NaN, Double.NaN));
-    }
-
-    private AverageMetrics mapToAverageMetrics(SensorDayData data) {
-        return new AverageMetrics(new Average(data.temperature().sum(), data.temperature().count()),
-                new Average(data.humidity().sum(), data.humidity().count()));
     }
 
     private void throwNotFoundExceptionIfNull(String sensorId, Object sensorData) {
@@ -103,17 +100,7 @@ public class WeatherAggregationService {
                 .stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        am -> mapToSensorDayData(am.getValue())));
-    }
-
-    private SensorDayData mapToSensorDayData(AverageMetrics averageMetrics) {
-        return new SensorDayData(convertToAverageData(averageMetrics.getTemperature()),
-                convertToAverageData(averageMetrics.getHumidity()));
-    }
-
-
-    private AverageData convertToAverageData(Average average) {
-        return new AverageData(average.getAvg(), average.getSum(), average.getCount());
+                        am -> mapper.mapToSensorDayData(am.getValue())));
     }
 
     private Map<String, SensorDayData> mergeDayDataParameters(Map<String, SensorDayData> first, Map<String, SensorDayData> second) {
@@ -136,16 +123,9 @@ public class WeatherAggregationService {
     }
 
     private SensorDayData collapseSensorData(SensorDayData first, SensorDayData second) {
-        AverageData averageTemperature = getAverage(first.temperature(), second.temperature());
-        AverageData averageHumidity = getAverage(first.humidity(), second.humidity());
-
-        return new SensorDayData(averageTemperature, averageHumidity);
-    }
-
-    private AverageData getAverage(AverageData first, AverageData second) {
-        double avg = (first.avg() + second.avg()) / 2;
-        double sum = first.sum() + second.sum();
-        int count = first.count() + second.count();
-        return new AverageData(avg, sum, count);
+        AverageMetrics firstMetric = mapper.mapToAverageMetrics(first);
+        AverageMetrics secondMetric = mapper.mapToAverageMetrics(second);
+        AverageMetrics sum = firstMetric.plus(secondMetric);
+        return mapper.mapToSensorDayData(sum);
     }
 }

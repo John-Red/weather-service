@@ -1,5 +1,6 @@
 package com.eugene.weather;
 
+import com.eugene.weather.mapper.MetricsMapper;
 import com.eugene.weather.repository.SensorRepository;
 import com.eugene.weather.repository.data.AverageData;
 import com.eugene.weather.repository.data.SensorData;
@@ -23,11 +24,12 @@ public abstract class BaseTest {
 
     SensorRepository repositoryMock = mock(SensorRepository.class);
     ArgumentCaptor<SensorData> argumentCaptor = ArgumentCaptor.forClass(SensorData.class);
+    MetricsMapper mapper = new MetricsMapper();
     WeatherAggregationService sut;
 
     @BeforeEach
     protected void setUp() {
-        sut = new WeatherAggregationService(repositoryMock);
+        sut = new WeatherAggregationService(repositoryMock, mapper);
     }
 
 
