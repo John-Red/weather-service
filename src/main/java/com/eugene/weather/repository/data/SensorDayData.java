@@ -1,4 +1,7 @@
 package com.eugene.weather.repository.data;
 
-public record SensorDayData(AverageTemperature temperature) {
+import lombok.Builder;
+
+@Builder
+public record SensorDayData(AverageData temperature, AverageData humidity) {
 }
