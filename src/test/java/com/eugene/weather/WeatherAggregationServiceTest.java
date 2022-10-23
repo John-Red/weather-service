@@ -7,6 +7,7 @@ import com.eugene.weather.controller.exceptions.SensorNotFoundException;
 import com.eugene.weather.repository.SensorRepository;
 import com.eugene.weather.repository.data.SensorData;
 import com.eugene.weather.repository.data.SensorDayData;
+import com.eugene.weather.service.WeatherAggregationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -21,18 +22,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-class SensorNotFoundExceptionTest {
+class WeatherAggregationServiceTest {
 
     private static final LocalDate DATE = LocalDate.of(2007, 1, 1);
     private static final LocalDate NEXT_DATE = DATE.plusDays(1);
 
     SensorRepository repositoryMock = mock(SensorRepository.class);
     ArgumentCaptor<SensorData> argumentCaptor = ArgumentCaptor.forClass(SensorData.class);
-    com.eugene.weather.service.WeatherAggregationService sut;
+    WeatherAggregationService sut;
 
     @BeforeEach
     void setUp() {
-        sut = new com.eugene.weather.service.WeatherAggregationService(repositoryMock);
+        sut = new WeatherAggregationService(repositoryMock);
     }
 
     @Test
