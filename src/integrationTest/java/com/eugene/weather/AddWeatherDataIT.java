@@ -48,11 +48,15 @@ public class AddWeatherDataIT extends BaseSpringIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getSensorMetricsAsJsonString(Map.of(
                                 "date", "2022-10-14",
-                                "temperature", "20"))))
+                                "temperature", "20",
+                                "humidity", "60"))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.sensorId").value("London-1"))
                 .andExpect(jsonPath("$.datedSensorParams.2022-10-14.temperature.avg").value("20.0"))
                 .andExpect(jsonPath("$.datedSensorParams.2022-10-14.temperature.sum").value("20.0"))
-                .andExpect(jsonPath("$.datedSensorParams.2022-10-14.temperature.count").value("1"));
+                .andExpect(jsonPath("$.datedSensorParams.2022-10-14.temperature.count").value("1"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-10-14.humidity.avg").value("60.0"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-10-14.humidity.sum").value("60.0"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-10-14.humidity.count").value("1"));
     }
 }

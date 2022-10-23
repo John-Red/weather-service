@@ -25,11 +25,14 @@ public class GetWeatherDataIT extends BaseSpringIT {
         String sensorId = "Dublin-1";
         sendPostRequestToCreate(sensorId, getMultipleSensorMetricsAsJsonString(List.of(
                 Map.of("date", "2000-01-01",
-                        "temperature", "15"),
+                        "temperature", "15",
+                        "humidity", "50"),
                 Map.of("date", "2011-01-01",
-                        "temperature", "25"),
+                        "temperature", "25",
+                        "humidity", "60"),
                 Map.of("date", "2022-01-01",
-                        "temperature", "35"))));
+                        "temperature", "35",
+                        "humidity", "70"))));
         LocalDate today = LocalDate.now();
 
         mockMvc.perform(get(buildUriWith(sensorId)))
@@ -38,7 +41,8 @@ public class GetWeatherDataIT extends BaseSpringIT {
                 .andExpect(jsonPath("$.startDate").value("1970-01-01"))
                 .andExpect(jsonPath("$.endDate").value(today.toString()))
                 .andExpect(jsonPath("$.metrics").exists())
-                .andExpect(jsonPath("$.metrics.temperature").value(25));
+                .andExpect(jsonPath("$.metrics.temperature").value(25))
+                .andExpect(jsonPath("$.metrics.humidity").value(60.0));
     }
 
 
@@ -50,11 +54,14 @@ public class GetWeatherDataIT extends BaseSpringIT {
         String thirdDate = "2022-01-01";
         sendPostRequestToCreate(sensorId, getMultipleSensorMetricsAsJsonString(List.of(
                 Map.of("date", firstDate,
-                        "temperature", "15"),
+                        "temperature", "15",
+                        "humidity", "50"),
                 Map.of("date", secondDate,
-                        "temperature", "25"),
+                        "temperature", "25",
+                        "humidity", "60"),
                 Map.of("date", thirdDate,
-                        "temperature", "35"))));
+                        "temperature", "35",
+                        "humidity", "70"))));
 
         LocalDate from = LocalDate.parse(secondDate).minusDays(1);
         LocalDate to = LocalDate.parse(thirdDate).plusDays(1);
@@ -67,6 +74,7 @@ public class GetWeatherDataIT extends BaseSpringIT {
                 .andExpect(jsonPath("$.startDate").value(from.toString()))
                 .andExpect(jsonPath("$.endDate").value(to.toString()))
                 .andExpect(jsonPath("$.metrics").exists())
-                .andExpect(jsonPath("$.metrics.temperature").value(30.0));
+                .andExpect(jsonPath("$.metrics.temperature").value(30.0))
+                .andExpect(jsonPath("$.metrics.humidity").value(65.0));
     }
 }
