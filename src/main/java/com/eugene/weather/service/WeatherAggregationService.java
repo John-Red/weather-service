@@ -94,7 +94,8 @@ public class WeatherAggregationService {
                         sm -> sm.date().toString(),
                         sm -> new AverageMetrics(
                                 new Average(sm.temperature(), 1),
-                                new Average(sm.humidity(), 1)),
+                                new Average(sm.humidity(), 1),
+                                new Average(sm.wind(),1)),
                         AverageMetrics::plus))
                 .entrySet()
                 .stream()
