@@ -6,6 +6,7 @@ import com.eugene.weather.controller.data.SensorMetrics;
 import com.eugene.weather.controller.data.WeatherMetrics;
 import com.eugene.weather.controller.exceptions.SensorNotFoundException;
 import com.eugene.weather.repository.SensorRepository;
+import com.eugene.weather.repository.data.AverageTemperature;
 import com.eugene.weather.repository.data.SensorData;
 import com.eugene.weather.repository.data.SensorDayData;
 import lombok.AllArgsConstructor;
@@ -38,7 +39,8 @@ public class WeatherAggregationService {
                 .filter(params -> LocalDate.parse(params.getKey()).isAfter(startDate))
                 .filter(params -> LocalDate.parse(params.getKey()).isBefore(endDate))
                 .map(Map.Entry::getValue)
-                .mapToDouble(SensorDayData::tempAvg)
+                .map(SensorDayData::temperature)
+                .mapToDouble(AverageTemperature::tempAvg)
                 .average()
                 .orElse(NaN);
 
@@ -53,7 +55,8 @@ public class WeatherAggregationService {
                 .filter(params -> LocalDate.parse(params.getKey()).isAfter(startDate))
                 .filter(params -> LocalDate.parse(params.getKey()).isBefore(endDate))
                 .map(Map.Entry::getValue)
-                .mapToDouble(SensorDayData::tempAvg)
+                .map(SensorDayData::temperature)
+                .mapToDouble(AverageTemperature::tempAvg)
                 .average()
                 .orElse(NaN);
 
@@ -97,9 +100,10 @@ public class WeatherAggregationService {
 
     private SensorDayData mapToSensorDayData(AverageSensorData averageSensorData) {
         return new SensorDayData(
-                averageSensorData.getTempAvg(),
-                averageSensorData.getTempSum(),
-                averageSensorData.getTempCount());
+                new AverageTemperature(
+                        averageSensorData.getTempAvg(),
+                        averageSensorData.getTempSum(),
+                        averageSensorData.getTempCount()));
     }
 
     private Map<String, SensorDayData> mergeDayDataParameters(Map<String, SensorDayData> first, Map<String, SensorDayData> second) {
@@ -122,9 +126,11 @@ public class WeatherAggregationService {
     }
 
     private SensorDayData collapseSensorData(SensorDayData firstVal, SensorDayData secondVal) {
-        double avg = (firstVal.tempAvg() + secondVal.tempAvg()) / 2;
-        double sum = firstVal.tempSum() + secondVal.tempSum();
-        int count = firstVal.tempCount() + secondVal.tempCount();
-        return new SensorDayData(avg, sum, count);
+        AverageTemperature first = firstVal.temperature();
+        AverageTemperature second = secondVal.temperature();
+        double avg = (first.tempAvg() + second.tempAvg()) / 2;
+        double sum = first.tempSum() + second.tempSum();
+        int count = first.tempCount() + second.tempCount();
+        return new SensorDayData(new AverageTemperature(avg, sum, count));
     }
 }
