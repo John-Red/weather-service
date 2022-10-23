@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.Double.NaN;
 
@@ -31,16 +32,12 @@ public class WeatherAggregationService {
     public FramedSensorMetrics getAllSensorsData(LocalDate startDate, LocalDate endDate) {
         List<SensorData> allSensorsData = sensorRepository.getAllSensorsData();
         throwNotFoundExceptionIfNull("all", allSensorsData);
-        double averageTemp = allSensorsData.stream()
-                .map(SensorData::datedSensorParams)
-                .map(Map::entrySet)
-                .flatMap(Set::stream)
-                .filter(params -> LocalDate.parse(params.getKey()).isAfter(startDate))
-                .filter(params -> LocalDate.parse(params.getKey()).isBefore(endDate))
-                .map(Map.Entry::getValue)
-                .mapToDouble(SensorDayData::tempAvg)
-                .average()
-                .orElse(NaN);
+        Stream<Map.Entry<String, SensorDayData>> stream =
+                allSensorsData.stream()
+                        .map(SensorData::datedSensorParams)
+                        .map(Map::entrySet)
+                        .flatMap(Set::stream);
+        double averageTemp = calculateAverageSensorData(stream, startDate, endDate);
 
         return new FramedSensorMetrics("all", startDate, endDate, new WeatherMetrics(averageTemp));
     }
@@ -48,16 +45,20 @@ public class WeatherAggregationService {
     public FramedSensorMetrics getSensorData(String sensorId, @NonNull LocalDate startDate, @NonNull LocalDate endDate) {
         SensorData sensorData = sensorRepository.getSensorData(sensorId);
         throwNotFoundExceptionIfNull(sensorId, sensorData);
-        double averageTemp = sensorData.datedSensorParams().entrySet()
-                .stream()
-                .filter(params -> LocalDate.parse(params.getKey()).isAfter(startDate))
+        Stream<Map.Entry<String, SensorDayData>> stream =
+                sensorData.datedSensorParams().entrySet().stream();
+        double averageTemp = calculateAverageSensorData(stream, startDate, endDate);
+
+        return new FramedSensorMetrics(sensorId, startDate, endDate, new WeatherMetrics(averageTemp));
+    }
+
+    private double calculateAverageSensorData(Stream<Map.Entry<String, SensorDayData>> stream, LocalDate startDate, LocalDate endDate) {
+        return stream.filter(params -> LocalDate.parse(params.getKey()).isAfter(startDate))
                 .filter(params -> LocalDate.parse(params.getKey()).isBefore(endDate))
                 .map(Map.Entry::getValue)
                 .mapToDouble(SensorDayData::tempAvg)
                 .average()
                 .orElse(NaN);
-
-        return new FramedSensorMetrics(sensorId, startDate, endDate, new WeatherMetrics(averageTemp));
     }
 
     private void throwNotFoundExceptionIfNull(String sensorId, Object sensorData) {
