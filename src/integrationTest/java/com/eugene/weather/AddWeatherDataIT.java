@@ -51,8 +51,8 @@ public class AddWeatherDataIT extends BaseSpringIT {
                                 "temperature", "20"))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.sensorId").value("London-1"))
-                .andExpect(jsonPath("$.datedSensorParams.2022-10-14.tempAvg").value("20"))
-                .andExpect(jsonPath("$.datedSensorParams.2022-10-14.tempSum").value("20"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-10-14.tempAvg").value("20.0"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-10-14.tempSum").value("20.0"))
                 .andExpect(jsonPath("$.datedSensorParams.2022-10-14.tempCount").value("1"));
     }
 }

@@ -57,8 +57,8 @@ class WeatherAggregationServiceTest {
 
         SensorData result = captureAddRepositoryCall();
         SensorDayData date = result.datedSensorParams().get(DATE.toString());
-        assertEquals(15, date.tempAvg());
-        assertEquals(30, date.tempSum());
+        assertEquals(15.0, date.tempAvg());
+        assertEquals(30.0, date.tempSum());
         assertEquals(2, date.tempCount());
     }
 
@@ -74,13 +74,13 @@ class WeatherAggregationServiceTest {
 
         SensorData result = captureAddRepositoryCall();
         SensorDayData firstDay = result.datedSensorParams().get(DATE.toString());
-        assertEquals(10, firstDay.tempAvg());
-        assertEquals(10, firstDay.tempSum());
+        assertEquals(10.0, firstDay.tempAvg());
+        assertEquals(10.0, firstDay.tempSum());
         assertEquals(1, firstDay.tempCount());
 
         SensorDayData secondDay = result.datedSensorParams().get(NEXT_DATE.toString());
-        assertEquals(20, secondDay.tempAvg());
-        assertEquals(20, secondDay.tempSum());
+        assertEquals(20.0, secondDay.tempAvg());
+        assertEquals(20.0, secondDay.tempSum());
         assertEquals(1, secondDay.tempCount());
     }
 
@@ -96,8 +96,8 @@ class WeatherAggregationServiceTest {
 
         SensorData result = captureUpdateRepositoryCall();
         SensorDayData date = result.datedSensorParams().get(DATE.toString());
-        assertEquals(10, date.tempAvg());
-        assertEquals(10, date.tempSum());
+        assertEquals(10.0, date.tempAvg());
+        assertEquals(10.0, date.tempSum());
         assertEquals(1, date.tempCount());
     }
 
@@ -143,8 +143,8 @@ class WeatherAggregationServiceTest {
 
         SensorData result = captureUpdateRepositoryCall();
         SensorDayData date = result.datedSensorParams().get(DATE.toString());
-        assertEquals(15, date.tempAvg());
-        assertEquals(30, date.tempSum());
+        assertEquals(15.0, date.tempAvg());
+        assertEquals(30.0, date.tempSum());
         assertEquals(2, date.tempCount());
     }
 
@@ -163,7 +163,7 @@ class WeatherAggregationServiceTest {
         FramedSensorMetrics result = sut.getSensorData(id, startDate, endDate);
 
         assertEquals("testId", result.sensorId());
-        assertEquals(15, result.metrics().temperature());
+        assertEquals(15.0, result.metrics().temperature());
     }
 
     @Test
@@ -210,7 +210,7 @@ class WeatherAggregationServiceTest {
 
         FramedSensorMetrics result = sut.getSensorData(id, startDate, endDate);
 
-        assertEquals(15, result.metrics().temperature());
+        assertEquals(15.0, result.metrics().temperature());
         assertEquals(startDate, result.startDate());
         assertEquals(endDate, result.endDate());
     }
