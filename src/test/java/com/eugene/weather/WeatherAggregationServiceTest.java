@@ -58,9 +58,7 @@ class WeatherAggregationServiceTest {
 
         SensorData result = captureAddRepositoryCall();
         AverageTemperature date = getAverageTemperature(result, DATE);
-        assertEquals(15.0, date.tempAvg());
-        assertEquals(30.0, date.tempSum());
-        assertEquals(2, date.tempCount());
+        assertParamsEquals(15.0, 30.0, 2, date);
     }
 
     @Test
@@ -75,14 +73,10 @@ class WeatherAggregationServiceTest {
 
         SensorData result = captureAddRepositoryCall();
         AverageTemperature firstDay = getAverageTemperature(result, DATE);
-        assertEquals(10.0, firstDay.tempAvg());
-        assertEquals(10.0, firstDay.tempSum());
-        assertEquals(1, firstDay.tempCount());
+        assertParamsEquals(10.0, 10.0, 1, firstDay);
 
         AverageTemperature secondDay = getAverageTemperature(result, NEXT_DATE);
-        assertEquals(20.0, secondDay.tempAvg());
-        assertEquals(20.0, secondDay.tempSum());
-        assertEquals(1, secondDay.tempCount());
+        assertParamsEquals(20.0, 20.0, 1, secondDay);
     }
 
     @Test
@@ -97,9 +91,7 @@ class WeatherAggregationServiceTest {
 
         SensorData result = captureUpdateRepositoryCall();
         AverageTemperature date = getAverageTemperature(result, DATE);
-        assertEquals(10.0, date.tempAvg());
-        assertEquals(10.0, date.tempSum());
-        assertEquals(1, date.tempCount());
+        assertParamsEquals(10.0, 10.0, 1, date);
     }
 
     @Test
@@ -144,9 +136,7 @@ class WeatherAggregationServiceTest {
 
         SensorData result = captureUpdateRepositoryCall();
         AverageTemperature date = getAverageTemperature(result, DATE);
-        assertEquals(15.0, date.tempAvg());
-        assertEquals(30.0, date.tempSum());
-        assertEquals(2, date.tempCount());
+        assertParamsEquals(15.0, 30.0, 2, date);
     }
 
     @Test
@@ -306,5 +296,11 @@ class WeatherAggregationServiceTest {
 
     private AverageTemperature getAverageTemperature(SensorData result, LocalDate date) {
         return result.datedSensorParams().get(date.toString()).temperature();
+    }
+
+    private void assertParamsEquals(double avg, double sum, int count, AverageTemperature temperature) {
+        assertEquals(avg, temperature.avg());
+        assertEquals(sum, temperature.sum());
+        assertEquals(count, temperature.count());
     }
 }

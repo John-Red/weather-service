@@ -43,8 +43,8 @@ public class UpdateWeatherDataIT extends BaseSpringIT {
                                 , "temperature", "20"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.sensorId").value("London-1"))
-                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.temperature.tempAvg").value("15.0"))
-                .andExpect(jsonPath("$.datedSensorParams.2022-01-02.temperature.tempAvg").value("20.0"));
+                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.temperature.avg").value("15.0"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-01-02.temperature.avg").value("20.0"));
     }
 
 
@@ -62,8 +62,8 @@ public class UpdateWeatherDataIT extends BaseSpringIT {
                                 , "temperature", "10"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.sensorId").value("London-1"))
-                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.temperature.tempAvg").value("15.0"))
-                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.temperature.tempSum").value("30.0"))
-                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.temperature.tempCount").value("2"));
+                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.temperature.avg").value("15.0"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.temperature.sum").value("30.0"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.temperature.count").value("2"));
     }
 }

@@ -40,7 +40,7 @@ public class WeatherAggregationService {
                 .filter(params -> LocalDate.parse(params.getKey()).isBefore(endDate))
                 .map(Map.Entry::getValue)
                 .map(SensorDayData::temperature)
-                .mapToDouble(AverageTemperature::tempAvg)
+                .mapToDouble(AverageTemperature::avg)
                 .average()
                 .orElse(NaN);
 
@@ -56,7 +56,7 @@ public class WeatherAggregationService {
                 .filter(params -> LocalDate.parse(params.getKey()).isBefore(endDate))
                 .map(Map.Entry::getValue)
                 .map(SensorDayData::temperature)
-                .mapToDouble(AverageTemperature::tempAvg)
+                .mapToDouble(AverageTemperature::avg)
                 .average()
                 .orElse(NaN);
 
@@ -128,9 +128,9 @@ public class WeatherAggregationService {
     private SensorDayData collapseSensorData(SensorDayData firstVal, SensorDayData secondVal) {
         AverageTemperature first = firstVal.temperature();
         AverageTemperature second = secondVal.temperature();
-        double avg = (first.tempAvg() + second.tempAvg()) / 2;
-        double sum = first.tempSum() + second.tempSum();
-        int count = first.tempCount() + second.tempCount();
+        double avg = (first.avg() + second.avg()) / 2;
+        double sum = first.sum() + second.sum();
+        int count = first.count() + second.count();
         return new SensorDayData(new AverageTemperature(avg, sum, count));
     }
 }
