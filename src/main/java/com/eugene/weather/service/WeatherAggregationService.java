@@ -38,7 +38,7 @@ public class WeatherAggregationService {
                 .filter(params -> LocalDate.parse(params.getKey()).isAfter(startDate))
                 .filter(params -> LocalDate.parse(params.getKey()).isBefore(endDate))
                 .map(Map.Entry::getValue)
-                .mapToInt(SensorDayData::tempAvg)
+                .mapToDouble(SensorDayData::tempAvg)
                 .average()
                 .orElse(NaN);
 
@@ -53,7 +53,7 @@ public class WeatherAggregationService {
                 .filter(params -> LocalDate.parse(params.getKey()).isAfter(startDate))
                 .filter(params -> LocalDate.parse(params.getKey()).isBefore(endDate))
                 .map(Map.Entry::getValue)
-                .mapToInt(SensorDayData::tempAvg)
+                .mapToDouble(SensorDayData::tempAvg)
                 .average()
                 .orElse(NaN);
 
@@ -122,8 +122,8 @@ public class WeatherAggregationService {
     }
 
     private SensorDayData collapseSensorData(SensorDayData firstVal, SensorDayData secondVal) {
-        int avg = (firstVal.tempAvg() + secondVal.tempAvg()) / 2;
-        int sum = firstVal.tempSum() + secondVal.tempSum();
+        double avg = (firstVal.tempAvg() + secondVal.tempAvg()) / 2;
+        double sum = firstVal.tempSum() + secondVal.tempSum();
         int count = firstVal.tempCount() + secondVal.tempCount();
         return new SensorDayData(avg, sum, count);
     }
