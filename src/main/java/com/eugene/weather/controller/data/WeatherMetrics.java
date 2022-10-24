@@ -1,4 +1,4 @@
 package com.eugene.weather.controller.data;
 
-public record WeatherMetrics(double temperature, double humidity) {
+public record WeatherMetrics(double temperature, double humidity, double wind) {
 }
