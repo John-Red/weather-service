@@ -55,7 +55,8 @@ You can set time period using optional parameters `from` and `to`
         "endDate": "2022-10-17",
         "metrics": {
             "temperature": 84.11111111111111,
-            "humidity": 70
+            "humidity": 70,
+            "wind": 4
         }
     }
 
@@ -83,7 +84,8 @@ You can set time period using optional parameters `from` and `to`
         "endDate": "2022-10-1",
         "metrics": {
             "temperature": 17.5,
-            "humidity": 70
+            "humidity": 70,
+            "wind": 4
         }
     }
 
@@ -99,13 +101,14 @@ You can create sensor with metrics using optional Json object to request content
         "sensorMetrics": [{
                 "date": "2022-10-14",
                 "temperature": 20,
-                "humidity": 70
+                "humidity": 70,
+                "wind": 4
             }]
     }
 
 ### Request
 
-    curl --location --request POST 'http://localhost:8080/v1/data/London-3' --header 'Content-Type: application/json' --data-raw '{"sensorMetrics": [{"date": "2022-10-14","temperature": 20,"humidity": 70}]
+    curl --location --request POST 'http://localhost:8080/v1/data/London-3' --header 'Content-Type: application/json' --data-raw '{"sensorMetrics": [{"date": "2022-10-14","temperature": 20,"humidity": 70, "wind": 4}]
 
 ### Response
 
@@ -122,6 +125,11 @@ You can create sensor with metrics using optional Json object to request content
             "humidity": {
                 "avg": 70.0,
                 "sum": 70.0,
+                "count": 1
+            },
+            "wind": {
+                "avg": 4.0,
+                "sum": 4.0,
                 "count": 1
             }
         }
@@ -144,7 +152,8 @@ Returns `409 Conflict` in case `sensorID` already exists
         "sensorMetrics": [{
                 "date": "2022-10-14",
                 "temperature": 20,
-                "humidity": 70
+                "humidity": 70,
+                "wind": 4
             }]
         }   
 
@@ -173,7 +182,12 @@ In case metrics for this date exists, service will compute new average values us
             "humidity": {
                 "avg": 0.0,
                 "sum": 0.0,
-                "count": 1
+                "count": 0
+            },
+            "wind": {
+                "avg": 0.0,
+                "sum": 0.0,
+                "count": 0
             }
         }
     }
