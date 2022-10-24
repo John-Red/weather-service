@@ -114,26 +114,12 @@ You can create sensor with metrics using optional Json object to request content
 
     HTTP/1.1 201 Created
     Content:
-    {
-        "sensorId": "London-5",
-        "datedSensorParams": {
-            "temperature": {
-                "avg": 20.0,
-                "sum": 20.0,
-                "count": 1
-            },
-            "humidity": {
-                "avg": 70.0,
-                "sum": 70.0,
-                "count": 1
-            },
-            "wind": {
-                "avg": 4.0,
-                "sum": 4.0,
-                "count": 1
-            }
-        }
-    }
+    [{
+        "date": "2022-10-14",
+        "temperature": 20.0,
+        "humidity": 0.0,
+        "wind": 0.0
+    }]
 
 Returns `409 Conflict` in case `sensorID` already exists
 
@@ -165,29 +151,15 @@ In case metrics for this date exists, service will compute new average values us
 
 ### Request
 
-    curl --location --request PUT 'http://localhost:8080/v1/data/London-1' --header 'Content-Type: application/json' --data-raw '{"sensorMetrics": [{"date": "2022-10-16","temperature": 0}]}'
+    curl --location --request PUT 'http://localhost:8080/v1/data/London-1' --header 'Content-Type: application/json' --data-raw '{"sensorMetrics": [{"date": "2022-10-16","temperature": 20,"humidity": 70, "wind": 4}]}'
 
 ### Response
 
     HTTP/1.1 200 OK
     Content:
-    {
-        "sensorId": "London-5",
-        "datedSensorParams": {
-            "temperature": {
-                "avg": 20.0,
-                "sum": 20.0,
-                "count": 1
-            },
-            "humidity": {
-                "avg": 0.0,
-                "sum": 0.0,
-                "count": 0
-            },
-            "wind": {
-                "avg": 0.0,
-                "sum": 0.0,
-                "count": 0
-            }
-        }
-    }
+    [{
+        "date": "2022-10-14",
+        "temperature": 20.0,
+        "humidity": 10.0,
+        "wind": 4.0
+    }]
