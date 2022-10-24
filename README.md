@@ -54,7 +54,8 @@ You can set time period using optional parameters `from` and `to`
         "startDate": "1970-01-01",
         "endDate": "2022-10-17",
         "metrics": {
-            "temperature": 84.11111111111111
+            "temperature": 84.11111111111111,
+            "humidity": 70
         }
     }
 
@@ -81,7 +82,8 @@ You can set time period using optional parameters `from` and `to`
         "startDate": "2022-1-1",
         "endDate": "2022-10-1",
         "metrics": {
-            "temperature": 17.5
+            "temperature": 17.5,
+            "humidity": 70
         }
     }
 
@@ -96,13 +98,14 @@ You can create sensor with metrics using optional Json object to request content
     {
         "sensorMetrics": [{
                 "date": "2022-10-14",
-                "temperature": 20
+                "temperature": 20,
+                "humidity": 70
             }]
     }
 
 ### Request
 
-    curl --location --request POST 'http://localhost:8080/v1/data/London-3' --header 'Content-Type: application/json' --data-raw '{"sensorMetrics": [{"date": "2022-10-14","temperature": 20}]
+    curl --location --request POST 'http://localhost:8080/v1/data/London-3' --header 'Content-Type: application/json' --data-raw '{"sensorMetrics": [{"date": "2022-10-14","temperature": 20,"humidity": 70}]
 
 ### Response
 
@@ -111,10 +114,15 @@ You can create sensor with metrics using optional Json object to request content
     {
         "sensorId": "London-5",
         "datedSensorParams": {
-            "2022-10-14": {
-            "tempAvg": 20,
-            "tempSum": 20,
-            "tempCount": 1
+            "temperature": {
+                "avg": 20.0,
+                "sum": 20.0,
+                "count": 1
+            },
+            "humidity": {
+                "avg": 70.0,
+                "sum": 70.0,
+                "count": 1
             }
         }
     }
@@ -135,7 +143,8 @@ Returns `409 Conflict` in case `sensorID` already exists
         {
         "sensorMetrics": [{
                 "date": "2022-10-14",
-                "temperature": 20
+                "temperature": 20,
+                "humidity": 70
             }]
         }   
 
@@ -154,10 +163,17 @@ In case metrics for this date exists, service will compute new average values us
     HTTP/1.1 200 OK
     Content:
     {
-        "sensorId": "Dublin-1",
-        "startDate": "2022-1-1",
-        "endDate": "2022-10-1",
-        "metrics": {
-            "temperature": 17.5
+        "sensorId": "London-5",
+        "datedSensorParams": {
+            "temperature": {
+                "avg": 20.0,
+                "sum": 20.0,
+                "count": 1
+            },
+            "humidity": {
+                "avg": 0.0,
+                "sum": 0.0,
+                "count": 1
+            }
         }
     }
