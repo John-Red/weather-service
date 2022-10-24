@@ -1,8 +1,9 @@
 package com.eugene.weather.controller;
 
+import com.eugene.weather.controller.data.DatedSensorMetrics;
 import com.eugene.weather.controller.data.FramedSensorMetrics;
 import com.eugene.weather.controller.data.SensorMetrics;
-import com.eugene.weather.repository.data.SensorData;
+import com.eugene.weather.controller.data.WeatherMetrics;
 import com.eugene.weather.service.WeatherAggregationService;
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -24,10 +25,10 @@ public class WeatherApiController {
     @GetMapping(path = "/data/all",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<FramedSensorMetrics> getAllSensorsData(
-                                                             @RequestParam(value = "from", required = false)
-                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                                             @RequestParam(value = "to", required = false)
-                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+            @RequestParam(value = "from", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "to", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         startDate = getDefaultIfNull(startDate, () -> LocalDate.EPOCH);
         endDate = getDefaultIfNull(endDate, LocalDate::now);
         return ResponseEntity.ok(weatherAggregationService.getAllSensorsData(startDate, endDate));
@@ -48,8 +49,8 @@ public class WeatherApiController {
     @PostMapping(path = "/data/{sensorId}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SensorData> addNewSensor(@PathVariable String sensorId,
-                                                   @RequestBody(required = false) SensorMetrics sensorMetrics) {
+    public ResponseEntity<List<DatedSensorMetrics>> addNewSensor(@PathVariable String sensorId,
+                                                       @RequestBody(required = false) SensorMetrics sensorMetrics) {
         sensorMetrics = getDefaultIfNull(sensorMetrics, () -> new SensorMetrics(List.of()));
         return ResponseEntity.status(HttpStatus.CREATED).body(weatherAggregationService.addSensorData(sensorId, sensorMetrics));
     }
@@ -61,8 +62,8 @@ public class WeatherApiController {
     @PutMapping(path = "/data/{sensorId}",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SensorData> updateSensorData(@PathVariable String sensorId,
-                                                       @RequestBody SensorMetrics sensorMetrics) {
+    public ResponseEntity<List<DatedSensorMetrics>> updateSensorData(@PathVariable String sensorId,
+                                                                     @RequestBody SensorMetrics sensorMetrics) {
         return ResponseEntity.ok(weatherAggregationService.updateSensorData(sensorId, sensorMetrics));
     }
 }

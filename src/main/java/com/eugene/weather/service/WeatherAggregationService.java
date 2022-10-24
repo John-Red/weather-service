@@ -73,21 +73,23 @@ public class WeatherAggregationService {
         }
     }
 
-    public SensorData addSensorData(String sensorId, SensorMetrics sensorMetrics) {
+    public List<DatedSensorMetrics> addSensorData(String sensorId, SensorMetrics sensorMetrics) {
         SensorData sensorData = new SensorData(sensorId, aggregateMetricsToAverageParams(sensorMetrics.sensorMetrics()));
-        return sensorRepository.addSensorData(sensorData);
+        SensorData newSensorData = sensorRepository.addSensorData(sensorData);
+        return mapper.mapToWeatherMetrics(newSensorData);
     }
 
-    public SensorData updateSensorData(String sensorId, @NonNull SensorMetrics sensorMetrics) {
+    public List<DatedSensorMetrics> updateSensorData(String sensorId, @NonNull SensorMetrics sensorMetrics) {
         SensorData oldSensorData = sensorRepository.getSensorData(sensorId);
         throwNotFoundExceptionIfNull(sensorId, oldSensorData);
         if (sensorMetrics.sensorMetrics().isEmpty()) {
-            return oldSensorData;
+            return mapper.mapToWeatherMetrics(oldSensorData);
         }
         var oldDataParams = oldSensorData.datedSensorParams();
         var newDataParams = aggregateMetricsToAverageParams(sensorMetrics.sensorMetrics());
         var datedSensorParams = mergeDayDataParameters(oldDataParams, newDataParams);
-        return sensorRepository.updateSensorData(new SensorData(sensorId, datedSensorParams));
+        SensorData updatedSensorData = sensorRepository.updateSensorData(new SensorData(sensorId, datedSensorParams));
+        return mapper.mapToWeatherMetrics(updatedSensorData);
     }
 
     private Map<String, SensorDayData> aggregateMetricsToAverageParams(List<DatedSensorMetrics> sensorMetrics) {
@@ -98,7 +100,7 @@ public class WeatherAggregationService {
                         sm -> new AverageMetrics(
                                 new Average(sm.temperature(), 1),
                                 new Average(sm.humidity(), 1),
-                                new Average(sm.wind(),1)),
+                                new Average(sm.wind(), 1)),
                         AverageMetrics::plus))
                 .entrySet()
                 .stream()

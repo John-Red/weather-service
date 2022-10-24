@@ -19,10 +19,10 @@ class UpdateWeatherAggregationServiceTest extends BaseTest {
 
     @Test
     void testUpdatesEmptyParametersWithNewMetrics() {
-        int newTemperature = 10;
+        double newTemperature = 10;
         String id = "testId";
         List<DatedSensorMetrics> newMetrics =
-                List.of(new DatedSensorMetrics(DATE, newTemperature, 0,0));
+                List.of(new DatedSensorMetrics(DATE, newTemperature, 0.0,0.0));
         mockRepositoryGetSensorData(id, Map.of());
 
         sut.updateSensorData(id, new SensorMetrics(newMetrics));
@@ -39,10 +39,13 @@ class UpdateWeatherAggregationServiceTest extends BaseTest {
         mockRepositoryGetSensorData(id, Map.of(DATE.toString(), oldData));
         List<DatedSensorMetrics> newEmptyMetrics = List.of();
 
-        SensorData result = sut.updateSensorData(id, new SensorMetrics(newEmptyMetrics));
+        List<DatedSensorMetrics> result = sut.updateSensorData(id, new SensorMetrics(newEmptyMetrics));
 
-        SensorDayData resultData = result.datedSensorParams().get(DATE.toString());
-        assertEquals(oldData, resultData);
+        assertEquals(1,result.size());
+        DatedSensorMetrics resultData = result.get(0);
+        assertEquals(oldData.temperature().avg(), resultData.temperature());
+        assertEquals(oldData.humidity().avg(), resultData.humidity());
+        assertEquals(oldData.wind().avg(), resultData.wind());
         verify(repositoryMock, never()).updateSensorData(any());
     }
 
@@ -51,7 +54,7 @@ class UpdateWeatherAggregationServiceTest extends BaseTest {
         mockRepositoryGetSensorData(null, null);
 
         List<DatedSensorMetrics> newMetrics =
-                List.of(new DatedSensorMetrics(DATE, 10, 0,0));
+                List.of(new DatedSensorMetrics(DATE, 10.0, 0.0,0.0));
 
 
         assertThrows(SensorNotFoundException.class,
@@ -67,7 +70,7 @@ class UpdateWeatherAggregationServiceTest extends BaseTest {
         Map<String, SensorDayData> oldMetrics = Map.of(DATE.toString(), oldTemperature);
         mockRepositoryGetSensorData(id, oldMetrics);
 
-        DatedSensorMetrics newTemperature = new DatedSensorMetrics(DATE, 20, 0,0);
+        DatedSensorMetrics newTemperature = new DatedSensorMetrics(DATE, 20.0, 0.0,0.0);
         List<DatedSensorMetrics> newMetrics = List.of(newTemperature);
 
         sut.updateSensorData(id, new SensorMetrics(newMetrics));
