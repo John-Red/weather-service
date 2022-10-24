@@ -60,8 +60,11 @@ public class WeatherAggregationService {
                 .map(Map.Entry::getValue)
                 .map(mapper::mapToAverageMetrics)
                 .reduce(AverageMetrics::plus)
-                .map(am -> new WeatherMetrics(am.getTemperature().getAvg(), am.getHumidity().getAvg()))
-                .orElse(new WeatherMetrics(Double.NaN, Double.NaN));
+                .map(am -> new WeatherMetrics(
+                        am.getTemperature().getAvg(),
+                        am.getHumidity().getAvg(),
+                        am.getWind().getAvg()))
+                .orElse(new WeatherMetrics(Double.NaN, Double.NaN,Double.NaN));
     }
 
     private void throwNotFoundExceptionIfNull(String sensorId, Object sensorData) {
