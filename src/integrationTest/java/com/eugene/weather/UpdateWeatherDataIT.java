@@ -23,8 +23,10 @@ public class UpdateWeatherDataIT extends BaseSpringIT {
     void returnsNotFoundWhenThereIsNoSensorIdInDatabase() throws Exception {
         mockMvc.perform(put("/v1/data/do-not-exist")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(getSensorMetricsAsJsonString(Map.of("date", "2022-01-01"
-                                , "temperature", "22"))))
+                        .content(getSensorMetricsAsJsonString(Map.of("date", "2022-01-01",
+                                "temperature", "22",
+                                "humidity", "60",
+                                "wind", "4"))))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("There is no sensor with id: do-not-exist"));
     }

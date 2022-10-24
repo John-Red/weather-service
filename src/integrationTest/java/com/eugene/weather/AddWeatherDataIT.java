@@ -42,6 +42,15 @@ public class AddWeatherDataIT extends BaseSpringIT {
     }
 
     @Test
+    void returnsBadRequestWhenSensorBodyIsNotComplete() throws Exception {
+        mockMvc.perform(post("/v1/data/London-1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(getSensorMetricsAsJsonString(Map.of(
+                                "date", "2022-10-14"))))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void addsSensorDataWithBody() throws Exception {
         mockMvc.perform(post("/v1/data/London-1")
                         .contentType(MediaType.APPLICATION_JSON)
