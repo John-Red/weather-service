@@ -19,10 +19,10 @@ class UpdateWeatherAggregationServiceTest extends BaseTest {
 
     @Test
     void testUpdatesEmptyParametersWithNewMetrics() {
-        int newTemperature = 10;
+        double newTemperature = 10;
         String id = "testId";
         List<DatedSensorMetrics> newMetrics =
-                List.of(new DatedSensorMetrics(DATE, newTemperature, 0,0));
+                List.of(new DatedSensorMetrics(DATE, newTemperature, 0.0,0.0));
         mockRepositoryGetSensorData(id, Map.of());
 
         sut.updateSensorData(id, new SensorMetrics(newMetrics));
@@ -54,7 +54,7 @@ class UpdateWeatherAggregationServiceTest extends BaseTest {
         mockRepositoryGetSensorData(null, null);
 
         List<DatedSensorMetrics> newMetrics =
-                List.of(new DatedSensorMetrics(DATE, 10, 0,0));
+                List.of(new DatedSensorMetrics(DATE, 10.0, 0.0,0.0));
 
 
         assertThrows(SensorNotFoundException.class,
@@ -70,7 +70,7 @@ class UpdateWeatherAggregationServiceTest extends BaseTest {
         Map<String, SensorDayData> oldMetrics = Map.of(DATE.toString(), oldTemperature);
         mockRepositoryGetSensorData(id, oldMetrics);
 
-        DatedSensorMetrics newTemperature = new DatedSensorMetrics(DATE, 20, 0,0);
+        DatedSensorMetrics newTemperature = new DatedSensorMetrics(DATE, 20.0, 0.0,0.0);
         List<DatedSensorMetrics> newMetrics = List.of(newTemperature);
 
         sut.updateSensorData(id, new SensorMetrics(newMetrics));
