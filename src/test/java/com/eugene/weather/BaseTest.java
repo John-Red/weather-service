@@ -65,6 +65,7 @@ public abstract class BaseTest {
     protected SensorDayData createSensorDayData(double sum, int count) {
         double avg = sum / count;
         return new SensorDayData(new AverageData(avg, sum, count),
+                new AverageData(avg, sum, count),
                 new AverageData(avg, sum, count));
     }
 }

@@ -10,5 +10,6 @@ public record DatedSensorMetrics(
         @NonNull
         LocalDate date,
         int temperature,
-        int humidity) {
+        int humidity,
+        int wind) {
 }

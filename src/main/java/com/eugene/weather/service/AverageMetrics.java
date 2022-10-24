@@ -8,9 +8,11 @@ import lombok.Getter;
 public class AverageMetrics {
     private Average temperature;
     private Average humidity;
+    private Average wind;
 
     public AverageMetrics plus(AverageMetrics other) {
         return new AverageMetrics(temperature.plus(other.temperature),
-                humidity.plus(other.humidity));
+                humidity.plus(other.humidity),
+                wind.plus(other.getWind()));
     }
 }

@@ -26,8 +26,8 @@ class AddWeatherAggregationServiceTest extends BaseTest {
         int firstTemperature = 10;
         int secondTemperature = 20;
         List<DatedSensorMetrics> twoMetricsForDay =
-                List.of(new DatedSensorMetrics(DATE, firstTemperature, 0)
-                        ,new DatedSensorMetrics(DATE, secondTemperature, 0));
+                List.of(new DatedSensorMetrics(DATE, firstTemperature, 0,0)
+                        ,new DatedSensorMetrics(DATE, secondTemperature, 0,0));
 
         sut.addSensorData("testId", new SensorMetrics(twoMetricsForDay));
 
@@ -41,8 +41,8 @@ class AddWeatherAggregationServiceTest extends BaseTest {
         int firstTemperature = 10;
         int secondTemperature = 20;
         List<DatedSensorMetrics> twoMetricsForDifferentDays =
-                List.of(new DatedSensorMetrics(DATE, firstTemperature, 0)
-                        , new DatedSensorMetrics(NEXT_DATE, secondTemperature, 0));
+                List.of(new DatedSensorMetrics(DATE, firstTemperature, 0,0)
+                        , new DatedSensorMetrics(NEXT_DATE, secondTemperature, 0,0));
 
         sut.addSensorData("testId", new SensorMetrics(twoMetricsForDifferentDays));
 
