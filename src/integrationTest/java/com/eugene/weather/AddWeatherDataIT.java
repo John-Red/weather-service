@@ -16,8 +16,7 @@ public class AddWeatherDataIT extends BaseSpringIT {
     void addsSensorDataById() throws Exception {
         mockMvc.perform(post("/v1/data/London-1")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.sensorId").value("London-1"));
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -49,14 +48,12 @@ public class AddWeatherDataIT extends BaseSpringIT {
                         .content(getSensorMetricsAsJsonString(Map.of(
                                 "date", "2022-10-14",
                                 "temperature", "20",
-                                "humidity", "60"))))
+                                "humidity", "60",
+                                "wind", "4"))))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.sensorId").value("London-1"))
-                .andExpect(jsonPath("$.datedSensorParams.2022-10-14.temperature.avg").value("20.0"))
-                .andExpect(jsonPath("$.datedSensorParams.2022-10-14.temperature.sum").value("20.0"))
-                .andExpect(jsonPath("$.datedSensorParams.2022-10-14.temperature.count").value("1"))
-                .andExpect(jsonPath("$.datedSensorParams.2022-10-14.humidity.avg").value("60.0"))
-                .andExpect(jsonPath("$.datedSensorParams.2022-10-14.humidity.sum").value("60.0"))
-                .andExpect(jsonPath("$.datedSensorParams.2022-10-14.humidity.count").value("1"));
+                .andExpect(jsonPath("$[0].date").value("2022-10-14"))
+                .andExpect(jsonPath("$[0].temperature").value("20.0"))
+                .andExpect(jsonPath("$[0].humidity").value("60.0"))
+                .andExpect(jsonPath("$[0].wind").value("4.0"));
     }
 }

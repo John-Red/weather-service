@@ -9,7 +9,7 @@ public record DatedSensorMetrics(
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
         @NonNull
         LocalDate date,
-        int temperature,
-        int humidity,
-        int wind) {
+        double temperature,
+        double humidity,
+        double wind) {
 }

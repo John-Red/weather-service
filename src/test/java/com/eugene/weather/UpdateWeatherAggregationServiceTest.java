@@ -39,10 +39,13 @@ class UpdateWeatherAggregationServiceTest extends BaseTest {
         mockRepositoryGetSensorData(id, Map.of(DATE.toString(), oldData));
         List<DatedSensorMetrics> newEmptyMetrics = List.of();
 
-        SensorData result = sut.updateSensorData(id, new SensorMetrics(newEmptyMetrics));
+        List<DatedSensorMetrics> result = sut.updateSensorData(id, new SensorMetrics(newEmptyMetrics));
 
-        SensorDayData resultData = result.datedSensorParams().get(DATE.toString());
-        assertEquals(oldData, resultData);
+        assertEquals(1,result.size());
+        DatedSensorMetrics resultData = result.get(0);
+        assertEquals(oldData.temperature().avg(), resultData.temperature());
+        assertEquals(oldData.humidity().avg(), resultData.humidity());
+        assertEquals(oldData.wind().avg(), resultData.wind());
         verify(repositoryMock, never()).updateSensorData(any());
     }
 
