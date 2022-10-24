@@ -34,17 +34,22 @@ public class UpdateWeatherDataIT extends BaseSpringIT {
         String sensorId = "London-1";
         sendPostRequestToCreate(sensorId, getSensorMetricsAsJsonString((Map.of(
                 "date", "2022-01-01",
-                "temperature", "15"))));
+                "temperature", "15",
+                "humidity", "50"))));
 
         mockMvc.perform(put(buildUriWith(sensorId))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getSensorMetricsAsJsonString(Map.of(
                                 "date", "2022-01-02"
-                                , "temperature", "20"))))
+                                , "temperature", "20",
+                                "humidity", "60"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.sensorId").value("London-1"))
-                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.tempAvg").value("15.0"))
-                .andExpect(jsonPath("$.datedSensorParams.2022-01-02.tempAvg").value("20.0"));
+                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.temperature.avg").value("15.0"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.humidity.avg").value("50.0"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-01-02.temperature.avg").value("20.0"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-01-02.humidity.avg").value("60.0"));
+
     }
 
 
@@ -53,17 +58,22 @@ public class UpdateWeatherDataIT extends BaseSpringIT {
         String sensorId = "London-1";
         sendPostRequestToCreate(sensorId, getSensorMetricsAsJsonString(Map.of(
                 "date", "2022-01-01",
-                "temperature", "20")));
+                "temperature", "20",
+                "humidity", "50")));
 
         mockMvc.perform(put(buildUriWith(sensorId))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getSensorMetricsAsJsonString(Map.of(
-                                "date", "2022-01-01"
-                                , "temperature", "10"))))
+                                "date", "2022-01-01",
+                                "temperature", "10",
+                                "humidity", "60"))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.sensorId").value("London-1"))
-                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.tempAvg").value("15.0"))
-                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.tempSum").value("30.0"))
-                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.tempCount").value("2"));
+                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.temperature.avg").value("15.0"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.temperature.sum").value("30.0"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.temperature.count").value("2"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.humidity.avg").value("55.0"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.humidity.sum").value("110.0"))
+                .andExpect(jsonPath("$.datedSensorParams.2022-01-01.humidity.count").value("2"));
     }
 }
